@@ -34,7 +34,7 @@ export const createPayment = async (req, res) => {
         }
 
         const payment = await Payment.create({
-            order: orderId,
+            orderId: orderId,
             paymentMethod,
             paymentStatus: "completed", // in a real gateway, this comes from the provider's response
             transactionDate: new Date(),
