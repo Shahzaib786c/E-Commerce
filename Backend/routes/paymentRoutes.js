@@ -11,6 +11,6 @@ const router = express.Router();
 
 router.post('/', protect, isAdmin, createPayment);
 router.get('/order/:orderId', protect, isAdmin, getPaymentByOrder);
-router.put('/:id/status', protect, isAdmin, updatePaymentStatus); // admin-only, once isAdmin exists
+router.put('/:id/status', protect, isAdmin, updatePaymentStatus); 
 
 export default router;

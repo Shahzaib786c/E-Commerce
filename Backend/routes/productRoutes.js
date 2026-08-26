@@ -11,11 +11,9 @@ import { isAdmin } from '../middlewares/isAdmin.js';
 
 const router = express.Router();
 
-// Public — product catalog browsing
 router.get('/', getProducts);
 router.get('/:id', getProductById);
 
-// Private (admin-only, once isAdmin exists)
 router.post('/', protect, isAdmin, createProduct);
 router.put('/:id', protect, isAdmin, updateProduct);
 router.delete('/:id', protect, isAdmin, deleteProduct);

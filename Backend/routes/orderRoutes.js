@@ -10,10 +10,9 @@ import { isAdmin } from '../middlewares/isAdmin.js';
 
 const router = express.Router();
 
-// Everything here requires login — no guest checkout
 router.post('/', protect, isAdmin, createOrder);
 router.get('/my-orders', protect, isAdmin, getMyOrders);
 router.get('/:id', protect, isAdmin, getOrderById);
-router.put('/:id/status', protect, isAdmin, updateOrderStatus); // admin-only, once isAdmin exists
+router.put('/:id/status', protect, isAdmin, updateOrderStatus); 
 
 export default router;
