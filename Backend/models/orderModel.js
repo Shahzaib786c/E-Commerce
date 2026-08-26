@@ -21,7 +21,9 @@ const orderItemSchema = new mongoose.Schema(
             min: [1, "Quantity must be at least 1"],
         },
     },
-    { _id: false }
+    {
+        _id: false
+    }
 );
 
 const orderSchema = new mongoose.Schema(
@@ -31,7 +33,9 @@ const orderSchema = new mongoose.Schema(
             required: [true, "User reference is required"],
             ref: "User",
         },
-        items: [orderItemSchema], // the embedding happens here
+
+        items: [ orderItemSchema],
+
         totalAmount: {
             type: Number,
             required: [true, "Total amount is required"],
@@ -47,4 +51,4 @@ const orderSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("Order", orderSchema)
+export default mongoose.model("Order", orderSchema);

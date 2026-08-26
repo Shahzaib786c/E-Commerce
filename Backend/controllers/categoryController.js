@@ -1,5 +1,5 @@
 import Category from "../models/categoryModel.js";
-import Product from "../models/productModel.js"; // needed for the orphan check on delete
+import Product from "../models/productModel.js"; 
 
 // @desc   Create a new category
 // @route  POST /api/categories
