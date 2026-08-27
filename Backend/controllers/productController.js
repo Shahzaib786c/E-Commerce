@@ -20,6 +20,17 @@ export const createProduct = async (req, res) => {
                 });
         }
 
+        const existingProduct = await Product.findOne(
+            {
+                name, category
+            });
+        if (existingProduct) {
+            return res.status(409).json(
+                {
+                    message: "A product with this name already exists in this category. Did you mean to update it instead?",
+                });
+        }
+
         const product = await Product.create(
             {
                 name,

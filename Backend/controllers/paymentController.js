@@ -67,9 +67,9 @@ export const getPaymentByOrder = async (req, res) => {
     try {
         const payment = await Payment.findOne(
             {
-                order: req.params.orderId
+                orderId: req.params.orderId
             }).populate(
-                "order",
+                "orderId",
                 "totalAmount orderStatus"
             );
 
@@ -107,7 +107,7 @@ export const updatePaymentStatus = async (req, res) => {
         }
 
         if (paymentStatus === "refunded") {
-            await Order.findByIdAndUpdate(payment.order,
+            await Order.findByIdAndUpdate(payment.orderId,
                 {
                     orderStatus: "cancelled"
                 });
