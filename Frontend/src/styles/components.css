@@ -1,0 +1,204 @@
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 11px 22px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: transform 0.12s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary {
+  background: var(--color-rose);
+  color: var(--color-cloud);
+}
+.btn-primary:hover {
+  background: var(--color-rose-dark);
+}
+.btn-secondary {
+  background: var(--color-cloud);
+  color: var(--color-plum);
+  border: 1.5px solid var(--color-border-strong);
+}
+.btn-secondary:hover {
+  border-color: var(--color-rose);
+  color: var(--color-rose);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--color-plum-soft);
+  padding: 8px 12px;
+}
+.btn-ghost:hover {
+  color: var(--color-rose);
+}
+.btn-block {
+  width: 100%;
+}
+.btn-sm {
+  padding: 7px 14px;
+  font-size: var(--fs-xs);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Inputs ---- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--color-plum-soft);
+}
+.input,
+select.input,
+textarea.input {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  background: var(--color-cloud);
+  color: var(--color-plum);
+  width: 100%;
+}
+.input:focus,
+select.input:focus,
+textarea.input:focus {
+  border-color: var(--color-rose);
+  outline: none;
+}
+.error-text {
+  font-size: var(--fs-xs);
+  color: var(--color-berry);
+}
+
+/* ---- Card ---- */
+.card {
+  background: var(--color-cloud);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---- Badges / pills ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+.badge-new {
+  background: var(--color-sage-light);
+  color: var(--color-sage);
+}
+.badge-low {
+  background: var(--color-honey-light);
+  color: #a06a1f;
+}
+.badge-out {
+  background: var(--color-berry-light);
+  color: var(--color-berry);
+}
+.status-pending {
+  background: var(--color-honey-light);
+  color: #a06a1f;
+}
+.status-shipped {
+  background: var(--color-rose-light);
+  color: var(--color-rose-dark);
+}
+.status-delivered {
+  background: var(--color-sage-light);
+  color: var(--color-sage);
+}
+.status-cancelled {
+  background: var(--color-berry-light);
+  color: var(--color-berry);
+}
+
+/* ---- Filter pills ---- */
+.pill {
+  border: 1.5px solid var(--color-border);
+  background: var(--color-cloud);
+  color: var(--color-plum-soft);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pill.active {
+  background: var(--color-plum);
+  color: var(--color-cloud);
+  border-color: var(--color-plum);
+}
+.pill:hover:not(.active) {
+  border-color: var(--color-rose);
+  color: var(--color-rose);
+}
+
+/* ---- Shared product grid (also used standalone on Wishlist etc.) ---- */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-4);
+}
+@media (max-width: 860px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  text-align: center;
+  padding: var(--sp-8) var(--sp-4);
+  color: var(--color-plum-soft);
+}
+.empty-state i {
+  font-size: 40px;
+  color: var(--color-border-strong);
+  margin-bottom: var(--sp-3);
+}
+
+/* ---- Toast ---- */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-plum);
+  color: var(--color-cloud);
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  box-shadow: var(--shadow-raised);
+  z-index: 1000;
+  animation: toast-in 0.2s ease;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

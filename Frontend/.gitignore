@@ -7,18 +7,37 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependency directories (Sab se ahem)
+node_modules/
+dist/
+dist-ssr/
+build/
+.cache/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# Optional npm cache directories
+.npm
+.eslintcache
+
+# Output folders (Production bundle)
+out/
+.next/
+
+# IDEs and editors configuration
+.idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
+
+# Local env files / Crucial Security (Apni keys aur tokens chupane ke liye)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# TypeScript diagnostic logs
+*.tsbuildinfo

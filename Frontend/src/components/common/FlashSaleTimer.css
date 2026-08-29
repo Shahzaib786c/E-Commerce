@@ -1,0 +1,111 @@
+/* FlashSaleTimer.css - Updated Theme Aligned Style */
+
+/* ---- Main Section Container ---- */
+.sale-timer {
+  /* Dark brown hata kar oopar wale light aesthetic ke mutabiq background color */
+  background: var(--color-cream, #fdf6ee); 
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--radius-lg);
+  margin: var(--sp-8) auto;
+  max-width: var(--content-max);
+  
+  /* Soft elegant outline aur light card shadow */
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+/* Inner Wrapper for Layout Alignment */
+.sale-timer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+/* ---- Left Side: Copy/Text Content ---- */
+.sale-timer__copy {
+  flex: 1;
+  min-width: 280px;
+}
+
+/* Limited time tag - Match with "THIS WEEK'S CUB" badge */
+.sale-timer__copy .eyebrow {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-rose, #e07a5f); /* Soft rose tint */
+  background: rgba(224, 122, 95, 0.08); /* Transparent badge capsule background */
+  padding: 4px 10px;
+  border-radius: var(--radius-pill, 99px);
+  margin-bottom: var(--sp-3);
+}
+
+/* Heading - Match with Hero Title font color */
+.sale-timer__copy h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  color: var(--color-plum, #3d2723); /* Soft rich deep brown text */
+  margin-bottom: var(--sp-2);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* Description text - Match with hero copy text style */
+.sale-timer__copy p {
+  font-size: var(--fs-sm);
+  color: var(--color-plum-soft, #5d4037); /* Soft light plum text */
+  line-height: 1.5;
+  max-width: 460px;
+}
+
+/* ---- Right Side: Countdown Clock Blocks ---- */
+.sale-timer__clock--large {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+/* Individual Timer Grid Boxes - Match with Price Badges look */
+.sale-timer__unit {
+  background: #ffffff; /* Solid white background containers */
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-md);
+  width: 72px;
+  height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Large Countdown Digits */
+.sale-timer__number {
+  font-family: monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-rose, #e07a5f); /* Bright signature pink/rose color code */
+  line-height: 1.1;
+}
+
+/* Time Sub-labels (Hours, Minutes, Seconds) */
+.sale-timer__unit-label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-plum-soft, #795548);
+  margin-top: 4px;
+}
+
+/* Colons between boxes */
+.sale-timer__colon {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-plum-soft, rgba(61, 39, 35, 0.3));
+  padding-bottom: 12px;
+}

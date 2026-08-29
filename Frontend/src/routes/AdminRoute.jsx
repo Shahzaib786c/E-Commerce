@@ -1,0 +1,15 @@
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+
+export default function AdminRoute() {
+  const { isLoggedIn, isAdmin } = useAuth();
+  const location = useLocation();
+
+  if (!isLoggedIn) {
+    return <Navigate to="/auth/login" state={{ from: location.pathname }} replace />;
+  }
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+  return <Outlet />;
+}

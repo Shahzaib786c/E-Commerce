@@ -1,0 +1,135 @@
+/* ============================================
+   CUDDLE & CO. — DESIGN TOKENS
+   A warm, playful palette for a kids gifting &
+   soft toys store. Plain CSS custom properties,
+   used everywhere instead of Tailwind utilities.
+   ============================================ */
+
+:root {
+  /* ---- Color palette ---- */
+  --color-cream: #fbf6ef;      /* page background */
+  --color-cloud: #ffffff;      /* card / surface background */
+  --color-blush: #f4e3df;      /* soft tinted surface */
+  --color-rose: #c96e7b;       /* primary brand accent */
+  --color-rose-dark: #a8505d;  /* hover / pressed state */
+  --color-rose-light: #f6dde1; /* pale accent fill */
+  --color-plum: #3e2a2f;       /* primary text */
+  --color-plum-soft: #7a6367;  /* secondary text */
+  --color-sage: #7c9473;       /* success / delivered */
+  --color-sage-light: #e6ecdf;
+  --color-honey: #e8a94b;      /* warning / pending */
+  --color-honey-light: #faedd7;
+  --color-berry: #b5495b;      /* danger / out of stock */
+  --color-berry-light: #f6dde0;
+  --color-border: #e8dcd3;
+  --color-border-strong: #d9c7ba;
+
+  /* ---- Typography ---- */
+  --font-display: "Fredoka", sans-serif;
+  --font-body: "Nunito Sans", sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: 2.25rem;
+  --fs-3xl: 3rem;
+
+  /* ---- Spacing scale ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  /* ---- Radius ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ---- Shadow (used sparingly) ---- */
+  --shadow-card: 0 2px 10px rgba(62, 42, 47, 0.06);
+  --shadow-raised: 0 6px 20px rgba(62, 42, 47, 0.1);
+
+  /* ---- Layout ---- */
+  --content-max: 1180px;
+  --header-h: 76px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-cream);
+  color: var(--color-plum);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-plum);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 2px;
+}
+
+.container {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--sp-5);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--sp-4);
+  }
+}
