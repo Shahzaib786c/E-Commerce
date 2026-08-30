@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router";
 
 import MainLayout from "./layouts/MainLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
@@ -44,22 +44,52 @@ const router = createBrowserRouter([
   {
     element: <MainLayout />,
     children: [
-      { path: "/", element: <HomePage /> },
-      { path: "/products", element: <ProductsPage /> },
-      { path: "/products/:id", element: <ProductDetailsPage /> },
-      { path: "/cart", element: <CartPage /> },
-      { path: "/wishlist", element: <WishlistPage /> },
-      { path: "/about", element: <AboutPage /> },
-      { path: "/contact", element: <ContactPage /> },
+      {
+        path: "/",
+        element: <HomePage />,
+      },
+      {
+        path: "/products",
+        element: <ProductsPage />,
+      },
+      {
+        path: "/products/:id",
+        element: <ProductDetailsPage />,
+      },
+      {
+        path: "/cart",
+        element: <CartPage />,
+      },
+      {
+        path: "/wishlist",
+        element: <WishlistPage />,
+      },
+      {
+        path: "/about",
+        element: <AboutPage />,
+      },
+      {
+        path: "/contact",
+        element: <ContactPage />,
+      },
 
       // Everything below requires login — ProtectedRoute redirects to
       // /auth/login and remembers where the user was headed.
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "/checkout", element: <CheckoutPage /> },
-          { path: "/order-success", element: <OrderSuccessPage /> },
-          { path: "/my-orders", element: <MyOrdersPage /> },
+          {
+            path: "/checkout",
+            element: <CheckoutPage />,
+          },
+          {
+            path: "/order-success",
+            element: <OrderSuccessPage />,
+          },
+          {
+            path: "/my-orders",
+            element: <MyOrdersPage />,
+          },
         ],
       },
     ],
@@ -69,9 +99,18 @@ const router = createBrowserRouter([
     path: "/auth",
     element: <AuthLayout />,
     children: [
-      { path: "login", element: <LoginPage /> },
-      { path: "register", element: <RegisterPage /> },
-      { path: "forgot", element: <ForgotPasswordPage /> },
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "forgot",
+        element: <ForgotPasswordPage />,
+      },
     ],
   },
 
@@ -82,30 +121,75 @@ const router = createBrowserRouter([
       {
         element: <AdminLayout />,
         children: [
-          { index: true, element: <DashboardPage /> },
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
 
-          { path: "categories", element: <CategoriesListPage /> },
-          { path: "categories/add", element: <CategoryAddPage /> },
-          { path: "categories/:id/edit", element: <CategoryEditPage /> },
+          {
+            path: "categories",
+            element: <CategoriesListPage />,
+          },
+          {
+            path: "categories/add",
+            element: <CategoryAddPage />,
+          },
+          {
+            path: "categories/:id/edit",
+            element: <CategoryEditPage />,
+          },
 
-          { path: "products", element: <ProductsListPage /> },
-          { path: "products/add", element: <ProductAddPage /> },
-          { path: "products/:id", element: <ProductViewPage /> },
-          { path: "products/:id/edit", element: <ProductEditPage /> },
+          {
+            path: "products",
+            element: <ProductsListPage />,
+          },
+          {
+            path: "products/add",
+            element: <ProductAddPage />,
+          },
+          {
+            path: "products/:id",
+            element: <ProductViewPage />,
+          },
+          {
+            path: "products/:id/edit",
+            element: <ProductEditPage />,
+          },
 
-          { path: "orders", element: <OrdersListPage /> },
-          { path: "orders/:id", element: <OrderViewEditPage /> },
+          {
+            path: "orders",
+            element: <OrdersListPage />,
+          },
+          {
+            path: "orders/:id",
+            element: <OrderViewEditPage />,
+          },
 
-          { path: "customers", element: <CustomersListPage /> },
-          { path: "customers/add", element: <CustomerAddPage /> },
-          { path: "customers/:id", element: <CustomerViewPage /> },
-          { path: "customers/:id/edit", element: <CustomerEditPage /> },
+          {
+            path: "customers",
+            element: <CustomersListPage />,
+          },
+          {
+            path: "customers/add",
+            element: <CustomerAddPage />,
+          },
+          {
+            path: "customers/:id",
+            element: <CustomerViewPage />,
+          },
+          {
+            path: "customers/:id/edit",
+            element: <CustomerEditPage />,
+          },
         ],
       },
     ],
   },
 
-  { path: "*", element: <NotFoundPage /> },
+  {
+    path: "*",
+    element: <NotFoundPage />,
+  },
 ]);
 
 export default router;

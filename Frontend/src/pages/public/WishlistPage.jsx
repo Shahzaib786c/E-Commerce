@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useWishlist } from "../../context/WishlistContext.jsx";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import ProductCard from "../../components/product/ProductCard.jsx";

@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import ProductImagePlaceholder from "../../components/product/ProductImagePlaceholder.jsx";

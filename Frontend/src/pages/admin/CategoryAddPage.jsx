@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";

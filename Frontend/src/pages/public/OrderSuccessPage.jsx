@@ -1,4 +1,4 @@
-import { Link, useLocation, Navigate } from "react-router-dom";
+import { Link, useLocation, Navigate } from "react-router";
 
 export default function OrderSuccessPage() {
   const location = useLocation();

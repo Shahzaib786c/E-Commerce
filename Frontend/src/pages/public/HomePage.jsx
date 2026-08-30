@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import ProductCard from "../../components/product/ProductCard.jsx";
 import PromoBanner from "../../components/common/PromoBanner.jsx";

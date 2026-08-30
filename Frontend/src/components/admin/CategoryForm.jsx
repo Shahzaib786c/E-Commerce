@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const ICON_OPTIONS = ["ti-hearts", "ti-paw", "ti-gift", "ti-sparkles", "ti-star", "ti-flower"];
 

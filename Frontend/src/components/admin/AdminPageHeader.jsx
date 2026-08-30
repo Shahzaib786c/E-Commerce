@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import "./AdminPageHeader.css";
 
 export default function AdminPageHeader({ title, addLink, addLabel }) {

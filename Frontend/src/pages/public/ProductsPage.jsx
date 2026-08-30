@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import ProductCard from "../../components/product/ProductCard.jsx";
 import FilterBar from "../../components/filters/FilterBar.jsx";

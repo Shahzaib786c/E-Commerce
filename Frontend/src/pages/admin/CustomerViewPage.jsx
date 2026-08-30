@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useOrders } from "../../context/OrderContext.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";

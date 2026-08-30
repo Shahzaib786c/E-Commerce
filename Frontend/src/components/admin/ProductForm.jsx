@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import "./ProductForm.css";
 

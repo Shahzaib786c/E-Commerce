@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useToast } from "../../context/ToastContext.jsx";
 import "./Footer.css";
 
