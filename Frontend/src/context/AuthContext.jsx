@@ -8,22 +8,32 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage("cc_auth_user", null);
   // All registered customers live here — this is the one place we'd swap
   // for a real API call (e.g. GET /api/customers) later.
-  const [customers, setCustomers] = useLocalStorage("cc_customers", seedCustomers);
+  const [customers, setCustomers] = useLocalStorage(
+    "cc_customers",
+    seedCustomers,
+  );
 
   function login(email, password) {
     const found = customers.find(
-      (c) => c.email.toLowerCase() === email.toLowerCase() && c.password === password
+      (c) =>
+        c.email.toLowerCase() === email.toLowerCase() &&
+        c.password === password,
     );
     if (!found) {
-      return { ok: false, error: "That email or password doesn't match our records." };
+      return {
+        ok: false,
+        error: "That email or password doesn't match our records.",
+      };
     }
     const { password: _pw, ...safeUser } = found;
     setUser(safeUser);
-    return { ok: true };
+    return { ok: true, user: safeUser };
   }
 
   function register({ name, email, phone, password }) {
-    const exists = customers.some((c) => c.email.toLowerCase() === email.toLowerCase());
+    const exists = customers.some(
+      (c) => c.email.toLowerCase() === email.toLowerCase(),
+    );
     if (exists) {
       return { ok: false, error: "An account with this email already exists." };
     }
@@ -46,7 +56,9 @@ export function AuthProvider({ children }) {
   }
 
   function updateCustomer(id, updates) {
-    setCustomers((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+    );
     if (user?.id === id) setUser((prev) => ({ ...prev, ...updates }));
   }
 

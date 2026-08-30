@@ -16,7 +16,13 @@ export default function LoginPage() {
     e.preventDefault();
     const result = login(email, password);
     if (result.ok) {
-      navigate(from, { replace: true });
+      // Admins always land in the admin panel, no matter where they came
+      // from. Everyone else goes back to wherever they were headed (or home).
+      if (result.user?.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } else {
       setError(result.error);
     }
@@ -70,7 +76,7 @@ export default function LoginPage() {
         </Link>
       </p>
       <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-plum-soft)", textAlign: "center", marginTop: "var(--sp-3)" }}>
-        Demo login: ayesha@example.com / password123
+        Demo login: ayesha@example.com / password123 · Admin: admin@cuddleco.com / admin123
       </p>
     </>
   );
