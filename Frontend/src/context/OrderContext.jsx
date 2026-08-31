@@ -13,7 +13,14 @@ export function OrderProvider({ children }) {
   // visible everywhere without needing a real backend yet.
   const [orders, setOrders] = useLocalStorage("cc_orders", []);
 
-  function placeOrder({ userId, items, subtotal, delivery, address, paymentMethod }) {
+  function placeOrder({
+    userId,
+    items,
+    subtotal,
+    delivery,
+    address,
+    paymentMethod,
+  }) {
     const order = {
       id: generateOrderId(),
       userId,
@@ -31,7 +38,9 @@ export function OrderProvider({ children }) {
   }
 
   function updateOrderStatus(orderId, status) {
-    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status } : o)),
+    );
   }
 
   function getOrdersForUser(userId) {
@@ -39,7 +48,9 @@ export function OrderProvider({ children }) {
   }
 
   return (
-    <OrderContext.Provider value={{ orders, placeOrder, updateOrderStatus, getOrdersForUser }}>
+    <OrderContext.Provider
+      value={{ orders, placeOrder, updateOrderStatus, getOrdersForUser }}
+    >
       {children}
     </OrderContext.Provider>
   );

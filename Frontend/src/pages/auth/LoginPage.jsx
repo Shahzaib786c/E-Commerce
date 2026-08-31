@@ -76,7 +76,7 @@ export default function LoginPage() {
         </Link>
       </p>
       <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-plum-soft)", textAlign: "center", marginTop: "var(--sp-3)" }}>
-        Demo login: ayesha@example.com / password123 · Admin: admin@cuddleco.com / admin123
+        Demo
       </p>
     </>
   );

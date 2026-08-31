@@ -7,16 +7,24 @@ const ProductsContext = createContext(null);
 
 export function ProductsProvider({ children }) {
   const [products, setProducts] = useLocalStorage("cc_products", seedProducts);
-  const [categories, setCategories] = useLocalStorage("cc_categories", seedCategories);
+  const [categories, setCategories] = useLocalStorage(
+    "cc_categories",
+    seedCategories,
+  );
 
   function addProduct(product) {
     const id = "p" + Date.now();
-    setProducts((prev) => [...prev, { id, reviews: [], rating: 0, ...product }]);
+    setProducts((prev) => [
+      ...prev,
+      { id, reviews: [], rating: 0, ...product },
+    ]);
     return id;
   }
 
   function updateProduct(id, updates) {
-    setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+    );
   }
 
   function deleteProduct(id) {
@@ -24,11 +32,16 @@ export function ProductsProvider({ children }) {
   }
 
   function addCategory(category) {
-    setCategories((prev) => [...prev, { id: "cat-" + Date.now(), ...category }]);
+    setCategories((prev) => [
+      ...prev,
+      { id: "cat-" + Date.now(), ...category },
+    ]);
   }
 
   function updateCategory(id, updates) {
-    setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+    setCategories((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+    );
   }
 
   function deleteCategory(id) {

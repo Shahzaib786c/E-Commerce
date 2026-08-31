@@ -12,7 +12,9 @@ export function CartProvider({ children }) {
       const existing = prev.find((i) => i.key === key);
       if (existing) {
         return prev.map((i) =>
-          i.key === key ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock) } : i
+          i.key === key
+            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock) }
+            : i,
         );
       }
       return [
@@ -34,7 +36,11 @@ export function CartProvider({ children }) {
 
   function updateQuantity(key, quantity) {
     setItems((prev) =>
-      prev.map((i) => (i.key === key ? { ...i, quantity: Math.max(1, Math.min(quantity, i.stock)) } : i))
+      prev.map((i) =>
+        i.key === key
+          ? { ...i, quantity: Math.max(1, Math.min(quantity, i.stock)) }
+          : i,
+      ),
     );
   }
 
@@ -48,12 +54,19 @@ export function CartProvider({ children }) {
 
   const subtotal = useMemo(
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
-    [items]
+    [items],
   );
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, updateQuantity, removeItem, clearCart, subtotal }}
+      value={{
+        items,
+        addItem,
+        updateQuantity,
+        removeItem,
+        clearCart,
+        subtotal,
+      }}
     >
       {children}
     </CartContext.Provider>

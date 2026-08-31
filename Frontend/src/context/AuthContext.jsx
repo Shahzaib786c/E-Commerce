@@ -35,7 +35,10 @@ export function AuthProvider({ children }) {
       (c) => c.email.toLowerCase() === email.toLowerCase(),
     );
     if (exists) {
-      return { ok: false, error: "An account with this email already exists." };
+      return {
+        ok: false,
+        error: "An account with this email already exists.",
+      };
     }
     const newCustomer = {
       id: "u" + (customers.length + 1) + "-" + Date.now(),
@@ -48,7 +51,9 @@ export function AuthProvider({ children }) {
     setCustomers([...customers, newCustomer]);
     const { password: _pw, ...safeUser } = newCustomer;
     setUser(safeUser);
-    return { ok: true };
+    return {
+      ok: true,
+    };
   }
 
   function logout() {
