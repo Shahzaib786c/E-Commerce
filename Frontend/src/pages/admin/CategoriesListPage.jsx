@@ -19,10 +19,22 @@ export default function CategoriesListPage() {
     {
       key: "icon",
       label: "",
-      render: (row) => <i className={`ti ${row.icon}`} style={{ fontSize: 18, color: "var(--color-rose)" }} aria-hidden="true"></i>,
+      render: (row) => (
+        <i
+          className={`ti ${row.icon}`}
+          style={{ fontSize: 18, color: "var(--color-rose)" }}
+          aria-hidden="true"
+        ></i>
+      ),
     },
-    { key: "name", label: "Name" },
-    { key: "slug", label: "Slug" },
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "slug",
+      label: "Slug",
+    },
     {
       key: "count",
       label: "Products",
@@ -46,7 +58,11 @@ export default function CategoriesListPage() {
 
   return (
     <div>
-      <AdminPageHeader title="Categories" addLink="/admin/categories/add" addLabel="Add category" />
+      <AdminPageHeader
+        title="Categories"
+        addLink="/admin/categories/add"
+        addLabel="Add category"
+      />
       <DataTable columns={columns} rows={categories} />
     </div>
   );

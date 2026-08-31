@@ -3,9 +3,17 @@ import Category from "../models/categoryModel.js";
 
 export const createProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, image, category } = req.body;
+        if (!req.file) {
+            return res.status(400).json(
+                {
+                    message: "Product image is required"
+                }
+            );
+        }
 
-        if (!name || !price || !stock || !image || !category) {
+        const { name, category, price, stock } = req.body;
+
+        if (!name || !price || !stock || !category) {
             return res.status(400).json(
                 {
                     message: "Missing required product fields"
@@ -31,16 +39,14 @@ export const createProduct = async (req, res) => {
                 });
         }
 
+        // Adopted Style: Spread req.body and override the image property with req.file.path
         const product = await Product.create(
             {
-                name,
-                description,
-                price,
-                stock,
-                image,
-                category,
+                ...req.body,
+                image: req.file.path
             });
 
+        // Kept Existing Logic: Returns the newly created product details
         res.status(201).json(product);
     } catch (error) {
         res.status(500).json(
@@ -49,6 +55,7 @@ export const createProduct = async (req, res) => {
             });
     }
 };
+
 
 
 export const getProducts = async (req, res) => {
