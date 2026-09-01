@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useToast } from "../../context/ToastContext.jsx";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
@@ -12,12 +14,10 @@ export default function LoginPage() {
 
   const from = location.state?.from || "/";
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const result = login(email, password);
+    const result = await login(email, password);
     if (result.ok) {
-      // Admins always land in the admin panel, no matter where they came
-      // from. Everyone else goes back to wherever they were headed (or home).
       if (result.user?.role === "admin") {
         navigate("/admin", { replace: true });
       } else {
@@ -25,19 +25,36 @@ export default function LoginPage() {
       }
     } else {
       setError(result.error);
+      showToast(result.error);
     }
   }
 
   return (
     <>
-      <p style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-md)", fontWeight: 600, marginBottom: 2 }}>
+      <p
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "var(--fs-md)",
+          fontWeight: 600,
+          marginBottom: 2,
+        }}
+      >
         Welcome back
       </p>
-      <p style={{ fontSize: "var(--fs-sm)", color: "var(--color-plum-soft)", marginBottom: "var(--sp-4)" }}>
+      <p
+        style={{
+          fontSize: "var(--fs-sm)",
+          color: "var(--color-plum-soft)",
+          marginBottom: "var(--sp-4)",
+        }}
+      >
         Log in to continue to checkout
       </p>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "var(--sp-3)" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "var(--sp-3)" }}
+      >
         <div className="field">
           <label>Email</label>
           <input
@@ -61,7 +78,14 @@ export default function LoginPage() {
           />
         </div>
         {error && <p className="error-text">{error}</p>}
-        <Link to="/auth/forgot" style={{ fontSize: "var(--fs-xs)", color: "var(--color-rose)", textAlign: "right" }}>
+        <Link
+          to="/auth/forgot"
+          style={{
+            fontSize: "var(--fs-xs)",
+            color: "var(--color-rose)",
+            textAlign: "right",
+          }}
+        >
           Forgot password?
         </Link>
         <button type="submit" className="btn btn-primary btn-block">
@@ -69,13 +93,30 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-plum-soft)", textAlign: "center", marginTop: "var(--sp-4)" }}>
+      <p
+        style={{
+          fontSize: "var(--fs-xs)",
+          color: "var(--color-plum-soft)",
+          textAlign: "center",
+          marginTop: "var(--sp-4)",
+        }}
+      >
         New here?{" "}
-        <Link to="/auth/register" style={{ color: "var(--color-rose)", fontWeight: 700 }}>
+        <Link
+          to="/auth/register"
+          style={{ color: "var(--color-rose)", fontWeight: 700 }}
+        >
           Create an account
         </Link>
       </p>
-      <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-plum-soft)", textAlign: "center", marginTop: "var(--sp-3)" }}>
+      <p
+        style={{
+          fontSize: "var(--fs-xs)",
+          color: "var(--color-plum-soft)",
+          textAlign: "center",
+          marginTop: "var(--sp-3)",
+        }}
+      >
         Demo
       </p>
     </>

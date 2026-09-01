@@ -1,62 +1,69 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
 import { seedCustomers } from "../data/customers.js";
+import api from "../api/axios.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useLocalStorage("cc_auth_user", null);
-  // All registered customers live here — this is the one place we'd swap
-  // for a real API call (e.g. GET /api/customers) later.
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // true while we check session on load
+
+  // Customers list stays mock/local for now — no backend endpoint yet (Step 8 in our plan)
   const [customers, setCustomers] = useLocalStorage(
     "cc_customers",
     seedCustomers,
   );
 
-  function login(email, password) {
-    const found = customers.find(
-      (c) =>
-        c.email.toLowerCase() === email.toLowerCase() &&
-        c.password === password,
-    );
-    if (!found) {
+  // On first load, ask the backend "am I still logged in?" via the cookie
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const res = await api.get("/users/me");
+        setUser(res.data);
+      } catch (err) {
+        setUser(null); // no valid cookie / not logged in
+      } finally {
+        setLoading(false);
+      }
+    }
+    checkAuth();
+  }, []);
+
+  async function login(email, password) {
+    try {
+      const res = await api.post("/users/login", { email, password });
+      setUser(res.data);
+      return { ok: true, user: res.data };
+    } catch (err) {
       return {
         ok: false,
-        error: "That email or password doesn't match our records.",
+        error: err.response?.data?.message || "Login failed. Please try again.",
       };
     }
-    const { password: _pw, ...safeUser } = found;
-    setUser(safeUser);
-    return { ok: true, user: safeUser };
   }
 
-  function register({ name, email, phone, password }) {
-    const exists = customers.some(
-      (c) => c.email.toLowerCase() === email.toLowerCase(),
-    );
-    if (exists) {
+  async function register({ name, email, password }) {
+    try {
+      await api.post("/users/register", { name, email, password });
+      await api.post("/users/logout"); // clear the auto-issued cookie — force a real login step
+      return { ok: true };
+    } catch (err) {
       return {
         ok: false,
-        error: "An account with this email already exists.",
+        error:
+          err.response?.data?.message ||
+          "Registration failed. Please try again.",
       };
     }
-    const newCustomer = {
-      id: "u" + (customers.length + 1) + "-" + Date.now(),
-      name,
-      email,
-      phone,
-      password,
-      joined: new Date().toISOString().slice(0, 10),
-    };
-    setCustomers([...customers, newCustomer]);
-    const { password: _pw, ...safeUser } = newCustomer;
-    setUser(safeUser);
-    return {
-      ok: true,
-    };
   }
 
-  function logout() {
+  async function logout() {
+    try {
+      await api.post("/users/logout");
+    } catch (err) {
+      // even if this fails, clear local state so the UI reflects logged-out
+    }
     setUser(null);
   }
 
@@ -64,7 +71,6 @@ export function AuthProvider({ children }) {
     setCustomers((prev) =>
       prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
     );
-    if (user?.id === id) setUser((prev) => ({ ...prev, ...updates }));
   }
 
   function addCustomer(customer) {
@@ -81,6 +87,7 @@ export function AuthProvider({ children }) {
         user,
         isLoggedIn: !!user,
         isAdmin: user?.role === "admin",
+        loading,
         customers,
         login,
         register,
