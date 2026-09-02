@@ -9,10 +9,14 @@ export default function ProductAddPage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  function handleSubmit(form) {
-    addProduct(form);
-    showToast("Product added");
-    navigate("/admin/products");
+  async function handleSubmit(formData) {
+    try {
+      await addProduct(formData);
+      showToast("Product added");
+      navigate("/admin/products");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to add product");
+    }
   }
 
   return (

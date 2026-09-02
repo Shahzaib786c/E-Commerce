@@ -1,51 +1,68 @@
-import { createContext, useContext } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage.js";
-import { seedProducts } from "../data/products.js";
-import { seedCategories } from "../data/categories.js";
+import { createContext, useContext, useState, useEffect } from "react";
+import api from "../api/axios.js";
 
 const ProductsContext = createContext(null);
 
 export function ProductsProvider({ children }) {
-  const [products, setProducts] = useLocalStorage("cc_products", seedProducts);
-  const [categories, setCategories] = useLocalStorage(
-    "cc_categories",
-    seedCategories,
-  );
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  function addProduct(product) {
-    const id = "p" + Date.now();
-    setProducts((prev) => [
-      ...prev,
-      { id, reviews: [], rating: 0, ...product },
-    ]);
-    return id;
+  // Fetch real products + categories from the backend on load
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [productsRes, categoriesRes] = await Promise.all([
+          api.get("/products"),
+          api.get("/categories"),
+        ]);
+        setProducts(productsRes.data);
+        setCategories(categoriesRes.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  async function addProduct(formData) {
+    // formData must be a real FormData object (includes the image file) — see note below
+    const res = await api.post("/products", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setProducts((prev) => [...prev, res.data]);
+    return res.data._id;
   }
 
-  function updateProduct(id, updates) {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updates } : p)),
-    );
+  async function updateProduct(id, formData) {
+    const res = await api.put(`/products/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setProducts((prev) => prev.map((p) => (p._id === id ? res.data : p)));
   }
 
-  function deleteProduct(id) {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  async function deleteProduct(id) {
+    await api.delete(`/products/${id}`);
+    setProducts((prev) => prev.filter((p) => p._id !== id));
   }
 
-  function addCategory(category) {
-    setCategories((prev) => [
-      ...prev,
-      { id: "cat-" + Date.now(), ...category },
-    ]);
+  async function addCategory(category) {
+    const res = await api.post("/categories", category);
+    setCategories((prev) => [...prev, res.data]);
   }
 
-  function updateCategory(id, updates) {
-    setCategories((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
-    );
+  async function updateCategory(id, updates) {
+    const res = await api.put(`/categories/${id}`, updates);
+    setCategories((prev) => prev.map((c) => (c._id === id ? res.data : c)));
   }
 
-  function deleteCategory(id) {
-    setCategories((prev) => prev.filter((c) => c.id !== id));
+  async function deleteCategory(id) {
+    await api.delete(`/categories/${id}`);
+    setCategories((prev) => prev.filter((c) => c._id !== id));
   }
 
   return (
@@ -53,6 +70,8 @@ export function ProductsProvider({ children }) {
       value={{
         products,
         categories,
+        loading,
+        error,
         addProduct,
         updateProduct,
         deleteProduct,

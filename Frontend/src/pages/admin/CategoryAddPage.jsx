@@ -9,10 +9,14 @@ export default function CategoryAddPage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  function handleSubmit(form) {
-    addCategory(form);
-    showToast("Category added");
-    navigate("/admin/categories");
+  async function handleSubmit(form) {
+    try {
+      await addCategory(form);
+      showToast("Category added");
+      navigate("/admin/categories");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to add category");
+    }
   }
 
   return (

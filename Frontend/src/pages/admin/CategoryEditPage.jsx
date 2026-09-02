@@ -10,19 +10,27 @@ export default function CategoryEditPage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const category = categories.find((c) => c.id === id);
+  const category = categories.find((c) => c._id === id);
   if (!category) return <Navigate to="/admin/categories" replace />;
 
-  function handleSubmit(form) {
-    updateCategory(id, form);
-    showToast("Category updated");
-    navigate("/admin/categories");
+  async function handleSubmit(form) {
+    try {
+      await updateCategory(id, form);
+      showToast("Category updated");
+      navigate("/admin/categories");
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to update category");
+    }
   }
 
   return (
     <div>
       <AdminPageHeader title="Edit category" />
-      <CategoryForm initialValues={category} onSubmit={handleSubmit} submitLabel="Save changes" />
+      <CategoryForm
+        initialValues={category}
+        onSubmit={handleSubmit}
+        submitLabel="Save changes"
+      />
     </div>
   );
 }

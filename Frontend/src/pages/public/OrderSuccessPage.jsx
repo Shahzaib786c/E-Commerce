@@ -7,7 +7,14 @@ export default function OrderSuccessPage() {
   if (!order) return <Navigate to="/" replace />;
 
   return (
-    <div className="container" style={{ padding: "var(--sp-8) 0", display: "flex", justifyContent: "center" }}>
+    <div
+      className="container"
+      style={{
+        padding: "var(--sp-8) 0",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
       <div style={{ textAlign: "center", maxWidth: 420 }}>
         <div
           style={{
@@ -21,16 +28,38 @@ export default function OrderSuccessPage() {
             margin: "0 auto var(--sp-4)",
           }}
         >
-          <i className="ti ti-check" style={{ fontSize: 30, color: "var(--color-sage)" }} aria-hidden="true"></i>
+          <i
+            className="ti ti-check"
+            style={{ fontSize: 30, color: "var(--color-sage)" }}
+            aria-hidden="true"
+          ></i>
         </div>
         <h1 style={{ marginBottom: "var(--sp-2)" }}>Order placed</h1>
-        <p style={{ color: "var(--color-plum-soft)", marginBottom: "var(--sp-2)" }}>
+        <p
+          style={{
+            color: "var(--color-plum-soft)",
+            marginBottom: "var(--sp-2)",
+          }}
+        >
           Thanks for your order, it's on its way to being prepared with care.
         </p>
-        <p style={{ fontSize: "var(--fs-sm)", color: "var(--color-plum-soft)", marginBottom: "var(--sp-5)" }}>
-          Order #{order.id} · ${order.total.toLocaleString()} · {order.paymentMethod}
+        <p
+          style={{
+            fontSize: "var(--fs-sm)",
+            color: "var(--color-plum-soft)",
+            marginBottom: "var(--sp-5)",
+          }}
+        >
+          Order #{order._id.slice(-6).toUpperCase()} · $
+          {order.totalAmount.toLocaleString()} · {order.paymentMethod}
         </p>
-        <div style={{ display: "flex", gap: "var(--sp-2)", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "var(--sp-2)",
+            justifyContent: "center",
+          }}
+        >
           <Link to="/my-orders" className="btn btn-secondary">
             View my orders
           </Link>

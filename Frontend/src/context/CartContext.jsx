@@ -1,14 +1,18 @@
 import { createContext, useContext, useMemo } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage.js";
+import { useAuth } from "./AuthContext.jsx";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useLocalStorage("cc_cart_items", []);
+  const { user } = useAuth();
+  const cartKey = `cc_cart_items_${user?._id || "guest"}`;
+  const [items, setItems] = useLocalStorage(cartKey, []);
 
+  // ...rest of the file (addItem, updateQuantity, removeItem, clearCart, subtotal) stays exactly the same
   function addItem(product, quantity = 1, variant = null) {
     setItems((prev) => {
-      const key = product.id + (variant || "");
+      const key = product._id + (variant || "");
       const existing = prev.find((i) => i.key === key);
       if (existing) {
         return prev.map((i) =>
@@ -21,11 +25,11 @@ export function CartProvider({ children }) {
         ...prev,
         {
           key,
-          productId: product.id,
+          productId: product._id,
           name: product.name,
           price: product.price,
-          image: product.images?.[0] || null,
-          category: product.category,
+          image: product.images?.[0] || null, // raw path, converted to full URL at render time
+          category: product.category?.slug || product.category,
           variant,
           quantity,
           stock: product.stock,

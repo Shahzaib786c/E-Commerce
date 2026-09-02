@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-const ICON_OPTIONS = ["ti-hearts", "ti-paw", "ti-gift", "ti-sparkles", "ti-star", "ti-flower"];
+const ICON_OPTIONS = [
+  "ti-hearts",
+  "ti-paw",
+  "ti-gift",
+  "ti-sparkles",
+  "ti-star",
+  "ti-flower",
+];
 
 export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
   const [form, setForm] = useState(
-    initialValues || { name: "", slug: "", icon: "ti-hearts" }
+    initialValues || { categoryName: "", slug: "", icon: "ti-hearts" },
   );
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -14,7 +21,7 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
     setForm((f) => ({
       ...f,
       [field]: value,
-      ...(field === "name" && !initialValues
+      ...(field === "categoryName" && !initialValues
         ? { slug: value.toLowerCase().trim().replace(/\s+/g, "-") }
         : {}),
     }));
@@ -22,7 +29,7 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name.trim()) {
+    if (!form.categoryName.trim()) {
       setError("Category name is required.");
       return;
     }
@@ -30,18 +37,34 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card" style={{ padding: "var(--sp-5)", maxWidth: 480 }}>
+    <form
+      onSubmit={handleSubmit}
+      className="card"
+      style={{ padding: "var(--sp-5)", maxWidth: 480 }}
+    >
       <div className="field" style={{ marginBottom: "var(--sp-3)" }}>
         <label>Category name</label>
-        <input className="input" value={form.name} onChange={(e) => update("name", e.target.value)} />
+        <input
+          className="input"
+          value={form.categoryName}
+          onChange={(e) => update("categoryName", e.target.value)}
+        />
       </div>
       <div className="field" style={{ marginBottom: "var(--sp-3)" }}>
         <label>Slug</label>
-        <input className="input" value={form.slug} onChange={(e) => update("slug", e.target.value)} />
+        <input
+          className="input"
+          value={form.slug}
+          onChange={(e) => update("slug", e.target.value)}
+        />
       </div>
       <div className="field" style={{ marginBottom: "var(--sp-4)" }}>
         <label>Icon</label>
-        <select className="input" value={form.icon} onChange={(e) => update("icon", e.target.value)}>
+        <select
+          className="input"
+          value={form.icon}
+          onChange={(e) => update("icon", e.target.value)}
+        >
           {ICON_OPTIONS.map((i) => (
             <option key={i} value={i}>
               {i}
@@ -55,7 +78,12 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
         </p>
       )}
       <div style={{ display: "flex", gap: "var(--sp-2)" }}>
-        <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => navigate("/admin/categories")}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ flex: 1 }}
+          onClick={() => navigate("/admin/categories")}
+        >
           Cancel
         </button>
         <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>

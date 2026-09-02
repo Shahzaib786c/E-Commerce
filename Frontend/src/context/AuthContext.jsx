@@ -1,28 +1,29 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage.js";
-import { seedCustomers } from "../data/customers.js";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import api from "../api/axios.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // true while we check session on load
+  const [loading, setLoading] = useState(true);
 
-  // Customers list stays mock/local for now — no backend endpoint yet (Step 8 in our plan)
-  const [customers, setCustomers] = useLocalStorage(
-    "cc_customers",
-    seedCustomers,
-  );
+  // Real registered users, fetched from the backend — replaces the old
+  // seedCustomers/localStorage approach entirely.
+  const [customers, setCustomers] = useState([]);
 
-  // On first load, ask the backend "am I still logged in?" via the cookie
   useEffect(() => {
     async function checkAuth() {
       try {
         const res = await api.get("/users/me");
         setUser(res.data);
       } catch (err) {
-        setUser(null); // no valid cookie / not logged in
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -46,7 +47,7 @@ export function AuthProvider({ children }) {
   async function register({ name, email, password }) {
     try {
       await api.post("/users/register", { name, email, password });
-      await api.post("/users/logout"); // clear the auto-issued cookie — force a real login step
+      await api.post("/users/logout");
       return { ok: true };
     } catch (err) {
       return {
@@ -62,23 +63,22 @@ export function AuthProvider({ children }) {
     try {
       await api.post("/users/logout");
     } catch (err) {
-      // even if this fails, clear local state so the UI reflects logged-out
+      /* clear local state regardless */
     }
     setUser(null);
   }
 
-  function updateCustomer(id, updates) {
-    setCustomers((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
-    );
-  }
+  // Admin-only: fetch every real registered user
+  const fetchCustomers = useCallback(async () => {
+    const res = await api.get("/users");
+    setCustomers(res.data);
+  }, []);
 
-  function addCustomer(customer) {
-    setCustomers((prev) => [...prev, { id: "u" + Date.now(), ...customer }]);
-  }
-
-  function deleteCustomer(id) {
-    setCustomers((prev) => prev.filter((c) => c.id !== id));
+  // Admin-only: promote/demote a user's role
+  async function updateCustomerRole(id, role) {
+    const res = await api.put(`/users/${id}/role`, { role });
+    setCustomers((prev) => prev.map((c) => (c._id === id ? res.data : c)));
+    return res.data;
   }
 
   return (
@@ -92,9 +92,8 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        updateCustomer,
-        addCustomer,
-        deleteCustomer,
+        fetchCustomers,
+        updateCustomerRole,
       }}
     >
       {children}

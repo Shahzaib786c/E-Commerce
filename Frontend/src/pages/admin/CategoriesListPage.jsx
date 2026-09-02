@@ -9,8 +9,8 @@ export default function CategoriesListPage() {
   const { showToast } = useToast();
 
   function handleDelete(cat) {
-    if (window.confirm(`Delete "${cat.name}"? This can't be undone.`)) {
-      deleteCategory(cat.id);
+    if (window.confirm(`Delete "${cat.categoryName}"? This can't be undone.`)) {
+      deleteCategory(cat._id);
       showToast("Category deleted");
     }
   }
@@ -28,7 +28,7 @@ export default function CategoriesListPage() {
       ),
     },
     {
-      key: "name",
+      key: "categoryName",
       label: "Name",
     },
     {
@@ -38,14 +38,15 @@ export default function CategoriesListPage() {
     {
       key: "count",
       label: "Products",
-      render: (row) => products.filter((p) => p.category === row.slug).length,
+      render: (row) =>
+        products.filter((p) => p.category?._id === row._id).length,
     },
     {
       key: "actions",
       label: "",
       render: (row) => (
         <div className="data-table-actions">
-          <Link to={`/admin/categories/${row.id}/edit`} aria-label="Edit">
+          <Link to={`/admin/categories/${row._id}/edit`} aria-label="Edit">
             <i className="ti ti-pencil" aria-hidden="true"></i>
           </Link>
           <button onClick={() => handleDelete(row)} aria-label="Delete">
@@ -63,7 +64,7 @@ export default function CategoriesListPage() {
         addLink="/admin/categories/add"
         addLabel="Add category"
       />
-      <DataTable columns={columns} rows={categories} />
+      <DataTable columns={columns} rows={categories} rowKey="_id" />
     </div>
   );
 }

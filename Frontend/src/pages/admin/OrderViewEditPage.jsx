@@ -1,41 +1,73 @@
+import { useEffect, useState } from "react";
 import { useParams, Navigate } from "react-router";
-import { useOrders } from "../../context/OrderContext.jsx";
-import { useAuth } from "../../context/AuthContext.jsx";
+import api from "../../api/axios.js";
 import { useToast } from "../../context/ToastContext.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 
-const STATUSES = ["Pending", "Shipped", "Delivered", "Cancelled"];
+const STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
 const STATUS_CLASS = {
-  Pending: "status-pending",
-  Shipped: "status-shipped",
-  Delivered: "status-delivered",
-  Cancelled: "status-cancelled",
+  pending: "status-pending",
+  confirmed: "status-pending",
+  shipped: "status-shipped",
+  delivered: "status-delivered",
+  cancelled: "status-cancelled",
 };
 
 export default function OrderViewEditPage() {
   const { id } = useParams();
-  const { orders, updateOrderStatus } = useOrders();
-  const { customers } = useAuth();
   const { showToast } = useToast();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  const order = orders.find((o) => o.id === id);
-  if (!order) return <Navigate to="/admin/orders" replace />;
+  useEffect(() => {
+    async function fetchOrder() {
+      try {
+        const res = await api.get(`/orders/${id}`);
+        setOrder(res.data);
+      } catch (err) {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOrder();
+  }, [id]);
 
-  const customer = customers.find((c) => c.id === order.userId);
+  async function handleStatusChange(status) {
+    try {
+      const res = await api.put(`/orders/${id}/status`, {
+        orderStatus: status,
+      });
+      setOrder(res.data);
+      showToast(`Order marked ${status}`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to update order");
+    }
+  }
+
+  if (loading) return <p>Loading order...</p>;
+  if (notFound || !order) return <Navigate to="/admin/orders" replace />;
 
   return (
     <div>
-      <AdminPageHeader title={`Order #${order.id}`} />
+      <AdminPageHeader title={`Order #${order._id.slice(-6).toUpperCase()}`} />
       <div className="card" style={{ padding: "var(--sp-5)", maxWidth: 640 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sp-4)" }}>
-          <span className={`badge ${STATUS_CLASS[order.status]}`}>{order.status}</span>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "var(--sp-4)",
+          }}
+        >
+          <span className={`badge ${STATUS_CLASS[order.orderStatus]}`}>
+            {order.orderStatus}
+          </span>
           <select
             className="input status-select"
-            value={order.status}
-            onChange={(e) => {
-              updateOrderStatus(order.id, e.target.value);
-              showToast(`Order marked ${e.target.value}`);
-            }}
+            value={order.orderStatus}
+            onChange={(e) => handleStatusChange(e.target.value)}
           >
             {STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -46,19 +78,38 @@ export default function OrderViewEditPage() {
         </div>
 
         <p style={{ fontWeight: 700, marginBottom: 4 }}>Customer</p>
-        <p style={{ color: "var(--color-plum-soft)", marginBottom: "var(--sp-3)" }}>
-          {customer?.name} · {customer?.email} · {customer?.phone}
+        <p
+          style={{
+            color: "var(--color-plum-soft)",
+            marginBottom: "var(--sp-3)",
+          }}
+        >
+          {order.user?.name} · {order.user?.email}
         </p>
 
         <p style={{ fontWeight: 700, marginBottom: 4 }}>Shipping address</p>
-        <p style={{ color: "var(--color-plum-soft)", marginBottom: "var(--sp-3)" }}>
-          {order.address.fullName}, {order.address.street}, {order.address.city}{" "}
-          {order.address.postalCode}
+        <p
+          style={{
+            color: "var(--color-plum-soft)",
+            marginBottom: "var(--sp-3)",
+          }}
+        >
+          {order.shippingAddress?.fullName}, {order.shippingAddress?.street},{" "}
+          {order.shippingAddress?.city} {order.shippingAddress?.postalCode}
         </p>
 
         <p style={{ fontWeight: 700, marginBottom: 4 }}>Items</p>
-        {order.items.map((item) => (
-          <div key={item.key} style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--fs-sm)", color: "var(--color-plum-soft)", marginBottom: 4 }}>
+        {order.items.map((item, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: "var(--fs-sm)",
+              color: "var(--color-plum-soft)",
+              marginBottom: 4,
+            }}
+          >
             <span>
               {item.name} x{item.quantity}
             </span>
@@ -66,11 +117,26 @@ export default function OrderViewEditPage() {
           </div>
         ))}
 
-        <div style={{ borderTop: "1px solid var(--color-border)", marginTop: "var(--sp-3)", paddingTop: "var(--sp-3)", display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+        <div
+          style={{
+            borderTop: "1px solid var(--color-border)",
+            marginTop: "var(--sp-3)",
+            paddingTop: "var(--sp-3)",
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: 700,
+          }}
+        >
           <span>Total</span>
-          <span>${order.total.toLocaleString()}</span>
+          <span>${order.totalAmount.toLocaleString()}</span>
         </div>
-        <p style={{ fontSize: "var(--fs-xs)", color: "var(--color-plum-soft)", marginTop: 4 }}>
+        <p
+          style={{
+            fontSize: "var(--fs-xs)",
+            color: "var(--color-plum-soft)",
+            marginTop: 4,
+          }}
+        >
           Payment: {order.paymentMethod}
         </p>
       </div>

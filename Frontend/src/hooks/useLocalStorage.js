@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function useLocalStorage(key, initialValue) {
   const [value, setValue] = useState(() => {
@@ -9,6 +9,22 @@ export function useLocalStorage(key, initialValue) {
       return initialValue;
     }
   });
+
+  const prevKey = useRef(key);
+
+  // If the key changes (e.g. a different user logs in), re-read that key's
+  // own stored value instead of continuing to show the previous key's data.
+  useEffect(() => {
+    if (prevKey.current !== key) {
+      try {
+        const stored = window.localStorage.getItem(key);
+        setValue(stored ? JSON.parse(stored) : initialValue);
+      } catch {
+        setValue(initialValue);
+      }
+      prevKey.current = key;
+    }
+  }, [key]);
 
   useEffect(() => {
     try {

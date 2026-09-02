@@ -7,12 +7,14 @@ import {
 } from '../controllers/orderController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
+import { getAllOrders } from '../controllers/orderController.js';
 
 const router = express.Router();
 
-router.post('/', protect, isAdmin, createOrder);
-router.get('/my-orders', protect, isAdmin, getMyOrders);
-router.get('/:id', protect, isAdmin, getOrderById);
-router.put('/:id/status', protect, isAdmin, updateOrderStatus); 
+router.get('/admin/all', protect, isAdmin, getAllOrders); // must be ABOVE /:id
+router.post('/', protect, createOrder);
+router.get('/my-orders', protect, getMyOrders);
+router.get('/:id', protect, getOrderById);
+router.put('/:id/status', protect, isAdmin, updateOrderStatus);
 
 export default router;

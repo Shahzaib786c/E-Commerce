@@ -28,17 +28,21 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
     {
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: [true, "User reference is required"],
-            ref: "User",
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        items: [orderItemSchema],
+        totalAmount: { type: Number, required: true },
+        deliveryFee: { type: Number, default: 0 },
+        shippingAddress: {
+            fullName: { type: String, required: true },
+            phone: { type: String, required: true },
+            street: { type: String, required: true },
+            city: { type: String, required: true },
+            postalCode: { type: String },
         },
-
-        items: [ orderItemSchema],
-
-        totalAmount: {
-            type: Number,
-            required: [true, "Total amount is required"],
+        paymentMethod: {
+            type: String,
+            enum: ["safepay", "cod"],
+            required: true,
         },
         orderStatus: {
             type: String,
@@ -46,9 +50,6 @@ const orderSchema = new mongoose.Schema(
             default: "pending",
         },
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
-
 export default mongoose.model("Order", orderSchema);

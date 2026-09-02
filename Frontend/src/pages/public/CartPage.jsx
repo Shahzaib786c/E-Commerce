@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useCart } from "../../context/CartContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
+import { getImageUrl } from "../../api/imageUrl.js";
 import ProductImagePlaceholder from "../../components/product/ProductImagePlaceholder.jsx";
 import "./CartPage.css";
 
@@ -12,7 +13,10 @@ export default function CartPage() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const delivery = items.length === 0 || subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FLAT;
+  const delivery =
+    items.length === 0 || subtotal >= FREE_DELIVERY_THRESHOLD
+      ? 0
+      : DELIVERY_FLAT;
   const total = subtotal + delivery;
 
   if (items.length === 0) {
@@ -21,7 +25,11 @@ export default function CartPage() {
         <div className="empty-state">
           <i className="ti ti-shopping-bag" aria-hidden="true"></i>
           <p>Your cart is empty.</p>
-          <Link to="/products" className="btn btn-primary" style={{ marginTop: "var(--sp-3)" }}>
+          <Link
+            to="/products"
+            className="btn btn-primary"
+            style={{ marginTop: "var(--sp-3)" }}
+          >
             Continue shopping
           </Link>
         </div>
@@ -38,14 +46,23 @@ export default function CartPage() {
             <div key={item.key} className="cart-item card">
               <div className="cart-item-image">
                 {item.image ? (
-                  <img src={item.image} alt={item.name} className="cart-item-image" />
+                  <img
+                    src={getImageUrl(item.image)}
+                    alt={item.name}
+                    className="cart-item-image"
+                  />
                 ) : (
-                  <ProductImagePlaceholder categorySlug={item.category} size="thumb" />
+                  <ProductImagePlaceholder
+                    categorySlug={item.category}
+                    size="thumb"
+                  />
                 )}
               </div>
               <div className="cart-item-info">
                 <p className="cart-item-name">{item.name}</p>
-                <p className="cart-item-variant">{item.variant ? `Size: ${item.variant}` : "No variant"}</p>
+                <p className="cart-item-variant">
+                  {item.variant ? `Size: ${item.variant}` : "No variant"}
+                </p>
               </div>
               <div className="qty-stepper">
                 <button
@@ -62,7 +79,9 @@ export default function CartPage() {
                   +
                 </button>
               </div>
-              <p className="cart-item-price">${(item.price * item.quantity).toLocaleString()}</p>
+              <p className="cart-item-price">
+                ${(item.price * item.quantity).toLocaleString()}
+              </p>
               <button
                 className="cart-item-remove"
                 onClick={() => {
@@ -91,7 +110,10 @@ export default function CartPage() {
             <span>Total</span>
             <span>${total.toLocaleString()}</span>
           </div>
-          <button className="btn btn-primary btn-block" onClick={() => navigate("/checkout")}>
+          <button
+            className="btn btn-primary btn-block"
+            onClick={() => navigate("/checkout")}
+          >
             Proceed to checkout
           </button>
           <p className="cart-summary-note">You'll be asked to log in first</p>

@@ -51,20 +51,21 @@ export default function Navbar() {
           </Link>
           <div className="navbar-dropdown" ref={catRef}>
             <span onClick={() => setCatOpen((o) => !o)}>
-              Categories <i className="ti ti-chevron-down" aria-hidden="true"></i>
+              Categories{" "}
+              <i className="ti ti-chevron-down" aria-hidden="true"></i>
             </span>
             {catOpen && (
               <div className="dropdown-menu">
                 {categories.map((c) => (
                   <Link
-                    key={c.id}
+                    key={c._id}
                     to={`/products?category=${c.slug}`}
                     onClick={() => {
                       setMobileOpen(false);
                       setCatOpen(false);
                     }}
                   >
-                    {c.name}
+                    {c.categoryName}
                   </Link>
                 ))}
               </div>
@@ -81,7 +82,9 @@ export default function Navbar() {
         <div className="navbar-icons">
           <Link to="/wishlist" className="icon-btn" aria-label="Wishlist">
             <i className="ti ti-heart" aria-hidden="true"></i>
-            {productIds.length > 0 && <span className="icon-badge">{productIds.length}</span>}
+            {productIds.length > 0 && (
+              <span className="icon-badge">{productIds.length}</span>
+            )}
           </Link>
           <Link to="/cart" className="icon-btn" aria-label="Cart">
             <i className="ti ti-shopping-bag" aria-hidden="true"></i>
@@ -99,7 +102,9 @@ export default function Navbar() {
               <div className="dropdown-menu dropdown-menu-right">
                 {isLoggedIn ? (
                   <>
-                    <span className="dropdown-hello">Hi, {user.name.split(" ")[0]}</span>
+                    <span className="dropdown-hello">
+                      Hi, {user.name.split(" ")[0]}
+                    </span>
                     <Link to="/my-orders" onClick={() => setAccOpen(false)}>
                       My orders
                     </Link>

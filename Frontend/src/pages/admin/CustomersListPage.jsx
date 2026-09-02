@@ -1,42 +1,47 @@
+import { useEffect } from "react";
 import { Link } from "react-router";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useOrders } from "../../context/OrderContext.jsx";
-import { useToast } from "../../context/ToastContext.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import DataTable from "../../components/admin/DataTable.jsx";
 
 export default function CustomersListPage() {
-  const { customers, deleteCustomer } = useAuth();
-  const { getOrdersForUser } = useOrders();
-  const { showToast } = useToast();
+  const { customers, fetchCustomers } = useAuth();
+  const { orders, fetchAllOrders } = useOrders();
 
-  function handleDelete(c) {
-    if (window.confirm(`Delete "${c.name}"? This can't be undone.`)) {
-      deleteCustomer(c.id);
-      showToast("Customer deleted");
-    }
+  useEffect(() => {
+    fetchCustomers();
+    fetchAllOrders(); // needed to compute each customer's order count below
+  }, [fetchCustomers, fetchAllOrders]);
+
+  function orderCountFor(customerId) {
+    return orders.filter((o) => o.user?._id === customerId).length;
   }
 
   const columns = [
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
-    { key: "phone", label: "Phone" },
-    { key: "orders", label: "Orders", render: (row) => getOrdersForUser(row.id).length },
-    { key: "joined", label: "Joined" },
+    { key: "role", label: "Role" },
+    { key: "orders", label: "Orders", render: (row) => orderCountFor(row._id) },
+    {
+      key: "createdAt",
+      label: "Joined",
+      render: (row) => new Date(row.createdAt).toLocaleDateString(),
+    },
     {
       key: "actions",
       label: "",
       render: (row) => (
         <div className="data-table-actions">
-          <Link to={`/admin/customers/${row.id}`} aria-label="View">
+          <Link to={`/admin/customers/${row._id}`} aria-label="View">
             <i className="ti ti-eye" aria-hidden="true"></i>
           </Link>
-          <Link to={`/admin/customers/${row.id}/edit`} aria-label="Edit">
+          <Link
+            to={`/admin/customers/${row._id}/edit`}
+            aria-label="Manage role"
+          >
             <i className="ti ti-pencil" aria-hidden="true"></i>
           </Link>
-          <button onClick={() => handleDelete(row)} aria-label="Delete">
-            <i className="ti ti-trash" aria-hidden="true"></i>
-          </button>
         </div>
       ),
     },
@@ -44,8 +49,8 @@ export default function CustomersListPage() {
 
   return (
     <div>
-      <AdminPageHeader title="Customers" addLink="/admin/customers/add" addLabel="Add customer" />
-      <DataTable columns={columns} rows={customers} />
+      <AdminPageHeader title="Customers" />
+      <DataTable columns={columns} rows={customers} rowKey="_id" />
     </div>
   );
 }

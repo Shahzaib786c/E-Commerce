@@ -1,27 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, Navigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { useWishlist } from "../../context/WishlistContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
+import { getImageUrl } from "../../api/imageUrl.js";
 import ProductImagePlaceholder from "../../components/product/ProductImagePlaceholder.jsx";
 import "./ProductDetailsPage.css";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
-  const { products, categories } = useProducts();
+  const { products, loading } = useProducts();
   const { addItem } = useCart();
   const { isWishlisted, toggle } = useWishlist();
   const { showToast } = useToast();
 
-  const product = products.find((p) => p.id === id);
+  const product = products.find((p) => p._id === id);
+
   const [activeImage, setActiveImage] = useState(0);
-  const [variant, setVariant] = useState(product?.variants?.[0] || null);
+  const [variant, setVariant] = useState(null);
   const [qty, setQty] = useState(1);
 
+  // Reset gallery/variant/quantity state whenever we land on a different
+  // product. useState's initial value only runs on first mount, so without
+  // this effect, navigating from one product's detail page straight to
+  // another's (same route, different :id) would leave stale selections in
+  // place — e.g. a variant that doesn't even exist on the new product.
+  useEffect(() => {
+    if (product) {
+      setActiveImage(0);
+      setVariant(product.variants?.[0] || null);
+      setQty(1);
+    }
+  }, [product?._id]);
+
+  if (loading) return <div className="container details-page">Loading...</div>;
   if (!product) return <Navigate to="/products" replace />;
 
-  const category = categories.find((c) => c.slug === product.category);
+  const reviews = product.reviews || []; // backend has no reviews field yet — treat as empty
   const outOfStock = product.stock === 0;
 
   function handleAddToCart() {
@@ -32,17 +48,23 @@ export default function ProductDetailsPage() {
   return (
     <div className="container details-page">
       <p className="breadcrumb">
-        <Link to="/">Home</Link> / <Link to={`/products?category=${product.category}`}>{category?.name}</Link> /{" "}
-        {product.name}
+        <Link to="/">Home</Link> /{" "}
+        <Link to={`/products?category=${product.category?.slug}`}>
+          {product.category?.categoryName}
+        </Link>{" "}
+        / {product.name}
       </p>
 
       <div className="details-grid">
         <div>
           <div className="details-main-image">
             {product.images.length > 0 ? (
-              <img src={product.images[activeImage]} alt={product.name} />
+              <img
+                src={getImageUrl(product.images[activeImage])}
+                alt={product.name}
+              />
             ) : (
-              <ProductImagePlaceholder categorySlug={product.category} />
+              <ProductImagePlaceholder categorySlug={product.category?.slug} />
             )}
           </div>
           {product.images.length > 1 && (
@@ -53,7 +75,7 @@ export default function ProductDetailsPage() {
                   className={`details-thumb ${i === activeImage ? "active" : ""}`}
                   onClick={() => setActiveImage(i)}
                 >
-                  <img src={img} alt="" />
+                  <img src={getImageUrl(img)} alt="" />
                 </button>
               ))}
             </div>
@@ -71,7 +93,7 @@ export default function ProductDetailsPage() {
               ></i>
             ))}
             <span>
-              {product.rating} ({product.reviews.length} reviews)
+              {product.rating} ({reviews.length} reviews)
             </span>
           </div>
           <p className="details-price">${product.price.toLocaleString()}</p>
@@ -126,9 +148,12 @@ export default function ProductDetailsPage() {
             >
               {outOfStock ? "Sold out" : "Add to cart"}
             </button>
-            <button className="btn btn-secondary details-wishlist-btn" onClick={() => toggle(product.id)}>
+            <button
+              className="btn btn-secondary details-wishlist-btn"
+              onClick={() => toggle(product._id)}
+            >
               <i
-                className={`ti ${isWishlisted(product.id) ? "ti-heart-filled" : "ti-heart"}`}
+                className={`ti ${isWishlisted(product._id) ? "ti-heart-filled" : "ti-heart"}`}
                 aria-hidden="true"
               ></i>
             </button>
@@ -137,12 +162,12 @@ export default function ProductDetailsPage() {
       </div>
 
       <div className="details-reviews">
-        <p className="details-reviews-title">Reviews ({product.reviews.length})</p>
-        {product.reviews.length === 0 ? (
+        <p className="details-reviews-title">Reviews ({reviews.length})</p>
+        {reviews.length === 0 ? (
           <p className="details-no-reviews">No reviews yet for this product.</p>
         ) : (
           <div className="reviews-list">
-            {product.reviews.map((r, i) => (
+            {reviews.map((r, i) => (
               <div key={i} className="review-card card">
                 <div className="review-header">
                   <span>{r.name}</span>

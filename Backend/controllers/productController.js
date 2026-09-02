@@ -3,56 +3,54 @@ import Category from "../models/categoryModel.js";
 
 export const createProduct = async (req, res) => {
     try {
+        const {
+            name,
+            description,
+            price,
+            stock,
+            category,
+            rating,
+            isNewArrival,
+            isBestseller,
+            variants,
+        } = req.body;
+
         if (!req.file) {
-            return res.status(400).json(
-                {
-                    message: "Product image is required"
-                }
-            );
+            return res.status(400).json({ message: "Product image is required" });
         }
 
-        const { name, category, price, stock } = req.body;
-
         if (!name || !price || !stock || !category) {
-            return res.status(400).json(
-                {
-                    message: "Missing required product fields"
-                });
+            return res.status(400).json({ message: "Missing required product fields" });
         }
 
         const categoryExists = await Category.findById(category);
         if (!categoryExists) {
-            return res.status(404).json(
-                {
-                    message: "Category not found"
-                });
+            return res.status(404).json({ message: "Category not found" });
         }
 
-        const existingProduct = await Product.findOne(
-            {
-                name, category
-            });
-        if (existingProduct) {
-            return res.status(409).json(
-                {
-                    message: "A product with this name already exists in this category. Did you mean to update it instead?",
-                });
-        }
+        const imageUrl = `/uploads/products/${req.file.filename}`;
 
-        // Adopted Style: Spread req.body and override the image property with req.file.path
-        const product = await Product.create(
-            {
-                ...req.body,
-                image: req.file.path
-            });
+        // form-data sends everything as strings — split "Small,Medium,Large" into a real array
+        const variantsArray = variants
+            ? variants.split(",").map((v) => v.trim()).filter(Boolean)
+            : [];
 
-        // Kept Existing Logic: Returns the newly created product details
+        const product = await Product.create({
+            name,
+            description,
+            price,
+            stock,
+            images: [imageUrl],
+            category,
+            rating,
+            isNewArrival,
+            isBestseller,
+            variants: variantsArray,
+        });
+
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json(
-            {
-                message: "Server error", error: error.message
-            });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
@@ -63,7 +61,7 @@ export const getProducts = async (req, res) => {
         const { category } = req.query;
         const filter = category ? { category } : {};
 
-        const products = await Product.find(filter).populate("category", "categoryName");
+        const products = await Product.find(filter).populate("category", "categoryName slug");
         res.status(200).json(products);
     } catch (error) {
         res.status(500).json(
@@ -98,36 +96,29 @@ export const updateProduct = async (req, res) => {
         if (req.body.category) {
             const categoryExists = await Category.findById(req.body.category);
             if (!categoryExists) {
-                return res.status(404).json(
-                    {
-                        message: "Category not found"
-
-                    });
+                return res.status(404).json({ message: "Category not found" });
             }
         }
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body,
-            {
-                new: true,
-                runValidators: true,
-            });
+
+        const updateData = { ...req.body };
+
+        // Only overwrite the image if a new file was actually uploaded this time
+        if (req.file) {
+            updateData.images = [`/uploads/products/${req.file.filename}`];
+        }
+        const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!product) {
-            return res.status(404).json(
-                {
-                    message: "Product not found"
-
-                });
+            return res.status(404).json({ message: "Product not found" });
         }
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json(
-            {
-                message: "Server error", error: error.message
-
-            });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
-
 export const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);

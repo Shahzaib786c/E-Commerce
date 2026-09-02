@@ -10,7 +10,7 @@ import product from "./product.mp4";
 const PAGE_SIZE = 8;
 
 export default function ProductsPage() {
-  const { products, categories } = useProducts();
+  const { products, categories, loading, error } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -28,12 +28,15 @@ export default function ProductsPage() {
   }
 
   const filtered = useMemo(() => {
+    console.log("Sample product:", products[0]);
     let list = [...products];
     if (activeCategory !== "all") {
-      list = list.filter((p) => p.category === activeCategory);
+      list = list.filter((p) => p.category?.slug === activeCategory);
     }
     if (search.trim()) {
-      list = list.filter((p) => p.name.toLowerCase().includes(search.trim().toLowerCase()));
+      list = list.filter((p) =>
+        p.name.toLowerCase().includes(search.trim().toLowerCase()),
+      );
     }
     if (sortBy === "price-asc") list.sort((a, b) => a.price - b.price);
     else if (sortBy === "price-desc") list.sort((a, b) => b.price - a.price);
@@ -44,15 +47,31 @@ export default function ProductsPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  if (loading) {
+    return (
+      <div className="container products-page">
+        <p className="results-count">Loading products...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container products-page">
+        <p className="results-count">Something went wrong: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container products-page">
-     <PromoBanner
-            title="Made just for them"
-            subtitle="Add a name, a note, or a keepsake touch — personalized gifts, from $14"
-            videoSrc={product}
-            tone="sage"
-            ctaLabel="Shop now"
-          />
+      <PromoBanner
+        title="Made just for them"
+        subtitle="Add a name, a note, or a keepsake touch — personalized gifts, from $14"
+        videoSrc={product}
+        tone="sage"
+        ctaLabel="Shop now"
+      />
 
       <FilterBar
         categories={categories}
@@ -77,7 +96,7 @@ export default function ProductsPage() {
       ) : (
         <div className="products-grid">
           {pageItems.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p._id} product={p} />
           ))}
         </div>
       )}

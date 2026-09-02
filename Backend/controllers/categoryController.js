@@ -3,25 +3,16 @@ import Product from "../models/productModel.js";
 
 export const createCategory = async (req, res) => {
     try {
-        const { categoryName, description } = req.body;
+        const { categoryName, slug, icon, description } = req.body;
 
-        if (!categoryName) {
-            return res.status(400).json(
-                {
-                    message: "Category name is required"
-                });
+        if (!categoryName || !slug) {
+            return res.status(400).json({ message: "Category name and slug are required" });
         }
 
-        const category = await Category.create(
-            {
-                categoryName, description
-            });
+        const category = await Category.create({ categoryName, slug, icon, description });
         res.status(201).json(category);
     } catch (error) {
-        res.status(500).json(
-            {
-                message: "Server error", error: error.message
-            });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 

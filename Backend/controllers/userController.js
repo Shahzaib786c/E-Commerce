@@ -52,7 +52,7 @@ export const registerUser = async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
-            role: user.role, 
+            role: user.role,
         });
     } catch (error) {
         res.status(500).json(
@@ -145,5 +145,63 @@ export const getMyProfile = async (req, res) => {
                 message: "Server error", error: error.message
 
             });
+    }
+};
+
+
+// @desc   Get all users (admin only)
+// @route  GET /api/users
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find().select("-password").sort({ createdAt: -1 });
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// @desc   Get a single user by id (admin only)
+// @route  GET /api/users/:id
+export const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// @desc   Update a user's role — promote/demote admin (admin only)
+// @route  PUT /api/users/:id/role
+export const updateUserRole = async (req, res) => {
+    try {
+        const { role } = req.body;
+
+        if (!["user", "admin"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role value" });
+        }
+
+        // Prevent an admin from accidentally demoting themselves and locking
+        // themselves out of the admin panel with no one left to undo it
+        if (req.params.id === req.user._id.toString() && role !== "admin") {
+            return res.status(400).json({ message: "You cannot change your own admin role" });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { role },
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };

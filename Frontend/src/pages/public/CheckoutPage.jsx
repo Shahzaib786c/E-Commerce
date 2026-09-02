@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useCart } from "../../context/CartContext.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useOrders } from "../../context/OrderContext.jsx";
+import { useToast } from "../../context/ToastContext.jsx";
 import "./CheckoutPage.css";
 
 const DELIVERY_FLAT = 6;
@@ -12,11 +13,12 @@ export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
   const { user } = useAuth();
   const { placeOrder } = useOrders();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState({
     fullName: user?.name || "",
-    phone: user?.phone || "",
+    phone: "",
     street: "",
     city: "",
     postalCode: "",
@@ -34,7 +36,11 @@ export default function CheckoutPage() {
         <div className="empty-state">
           <i className="ti ti-shopping-bag" aria-hidden="true"></i>
           <p>Your cart is empty, nothing to check out yet.</p>
-          <button className="btn btn-primary" style={{ marginTop: "var(--sp-3)" }} onClick={() => navigate("/products")}>
+          <button
+            className="btn btn-primary"
+            style={{ marginTop: "var(--sp-3)" }}
+            onClick={() => navigate("/products")}
+          >
             Browse products
           </button>
         </div>
@@ -56,24 +62,32 @@ export default function CheckoutPage() {
     return Object.keys(errs).length === 0;
   }
 
-  function handlePay() {
+  async function handlePay() {
     if (!validate()) return;
     setProcessing(true);
-    // Simulated payment processing delay — real Safepay integration happens
-    // here once the backend is connected.
-    setTimeout(() => {
-      const order = placeOrder({
-        userId: user.id,
-        items,
-        subtotal,
-        delivery,
-        address,
-        paymentMethod: paymentMethod === "safepay" ? "Safepay" : "Cash on delivery",
+    try {
+      const orderItems = items.map((item) => ({
+        product: item.productId,
+        quantity: item.quantity,
+      }));
+
+      const order = await placeOrder({
+        items: orderItems,
+        shippingAddress: address,
+        paymentMethod,
+        deliveryFee: delivery,
       });
+
       clearCart();
-      setProcessing(false);
       navigate("/order-success", { state: { order } });
-    }, 900);
+    } catch (err) {
+      showToast(
+        err.response?.data?.message ||
+          "Failed to place order. Please try again.",
+      );
+    } finally {
+      setProcessing(false);
+    }
   }
 
   return (
@@ -83,7 +97,8 @@ export default function CheckoutPage() {
         <div className="checkout-forms">
           <div className="card checkout-section">
             <p className="checkout-section-title">
-              <i className="ti ti-map-pin" aria-hidden="true"></i> Shipping address
+              <i className="ti ti-map-pin" aria-hidden="true"></i> Shipping
+              address
             </p>
             <div className="checkout-field-grid">
               <div className="field">
@@ -93,7 +108,9 @@ export default function CheckoutPage() {
                   value={address.fullName}
                   onChange={(e) => update("fullName", e.target.value)}
                 />
-                {errors.fullName && <p className="error-text">{errors.fullName}</p>}
+                {errors.fullName && (
+                  <p className="error-text">{errors.fullName}</p>
+                )}
               </div>
               <div className="field">
                 <label>Phone number</label>
@@ -115,7 +132,11 @@ export default function CheckoutPage() {
               </div>
               <div className="field">
                 <label>City</label>
-                <input className="input" value={address.city} onChange={(e) => update("city", e.target.value)} />
+                <input
+                  className="input"
+                  value={address.city}
+                  onChange={(e) => update("city", e.target.value)}
+                />
                 {errors.city && <p className="error-text">{errors.city}</p>}
               </div>
               <div className="field">
@@ -131,7 +152,9 @@ export default function CheckoutPage() {
 
           <div className="card checkout-section">
             <p className="checkout-section-title">Payment method</p>
-            <label className={`payment-option ${paymentMethod === "safepay" ? "selected" : ""}`}>
+            <label
+              className={`payment-option ${paymentMethod === "safepay" ? "selected" : ""}`}
+            >
               <input
                 type="radio"
                 name="payment"
@@ -141,7 +164,9 @@ export default function CheckoutPage() {
               Pay securely with Safepay
               <i className="ti ti-lock" aria-hidden="true"></i>
             </label>
-            <label className={`payment-option ${paymentMethod === "cod" ? "selected" : ""}`}>
+            <label
+              className={`payment-option ${paymentMethod === "cod" ? "selected" : ""}`}
+            >
               <input
                 type="radio"
                 name="payment"
@@ -172,7 +197,11 @@ export default function CheckoutPage() {
             <span>Total</span>
             <span>${total.toLocaleString()}</span>
           </div>
-          <button className="btn btn-primary btn-block" onClick={handlePay} disabled={processing}>
+          <button
+            className="btn btn-primary btn-block"
+            onClick={handlePay}
+            disabled={processing}
+          >
             <i className="ti ti-lock" aria-hidden="true"></i>
             {processing ? "Processing..." : `Pay $${total.toLocaleString()}`}
           </button>

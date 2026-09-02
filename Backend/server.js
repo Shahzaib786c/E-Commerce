@@ -10,8 +10,12 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import  path from "path";
+import contactRoutes from './routes/contactRoutes.js';
 
 dotenv.config();
+
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
 
 const app = express();
 
@@ -32,6 +36,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/contact', contactRoutes);
  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 

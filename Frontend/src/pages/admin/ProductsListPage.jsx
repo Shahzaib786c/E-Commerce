@@ -1,17 +1,18 @@
 import { Link } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
+import { getImageUrl } from "../../api/imageUrl.js";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import DataTable from "../../components/admin/DataTable.jsx";
 import ProductImagePlaceholder from "../../components/product/ProductImagePlaceholder.jsx";
 
 export default function ProductsListPage() {
-  const { products, categories, deleteProduct } = useProducts();
+  const { products, deleteProduct } = useProducts();
   const { showToast } = useToast();
 
   function handleDelete(p) {
     if (window.confirm(`Delete "${p.name}"? This can't be undone.`)) {
-      deleteProduct(p.id);
+      deleteProduct(p._id);
       showToast("Product deleted");
     }
   }
@@ -22,10 +23,17 @@ export default function ProductsListPage() {
       label: "",
       render: (row) =>
         row.images?.[0] ? (
-          <img src={row.images[0]} alt="" className="data-table-thumb" />
+          <img
+            src={getImageUrl(row.images[0])}
+            alt=""
+            className="data-table-thumb"
+          />
         ) : (
           <div className="data-table-thumb">
-            <ProductImagePlaceholder categorySlug={row.category} size="thumb" />
+            <ProductImagePlaceholder
+              categorySlug={row.category?.slug}
+              size="thumb"
+            />
           </div>
         ),
     },
@@ -33,9 +41,13 @@ export default function ProductsListPage() {
     {
       key: "category",
       label: "Category",
-      render: (row) => categories.find((c) => c.slug === row.category)?.name || row.category,
+      render: (row) => row.category?.categoryName || "—",
     },
-    { key: "price", label: "Price", render: (row) => `$${row.price.toLocaleString()}` },
+    {
+      key: "price",
+      label: "Price",
+      render: (row) => `$${row.price.toLocaleString()}`,
+    },
     {
       key: "stock",
       label: "Stock",
@@ -51,10 +63,10 @@ export default function ProductsListPage() {
       label: "",
       render: (row) => (
         <div className="data-table-actions">
-          <Link to={`/admin/products/${row.id}`} aria-label="View">
+          <Link to={`/admin/products/${row._id}`} aria-label="View">
             <i className="ti ti-eye" aria-hidden="true"></i>
           </Link>
-          <Link to={`/admin/products/${row.id}/edit`} aria-label="Edit">
+          <Link to={`/admin/products/${row._id}/edit`} aria-label="Edit">
             <i className="ti ti-pencil" aria-hidden="true"></i>
           </Link>
           <button onClick={() => handleDelete(row)} aria-label="Delete">
@@ -67,8 +79,12 @@ export default function ProductsListPage() {
 
   return (
     <div>
-      <AdminPageHeader title="Products" addLink="/admin/products/add" addLabel="Add product" />
-      <DataTable columns={columns} rows={products} />
+      <AdminPageHeader
+        title="Products"
+        addLink="/admin/products/add"
+        addLabel="Add product"
+      />
+      <DataTable columns={columns} rows={products} rowKey="_id" />
     </div>
   );
 }

@@ -1,55 +1,82 @@
-import { createContext, useContext } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage.js";
+import { createContext, useContext, useState, useCallback } from "react";
+import api from "../api/axios.js";
 
 const OrderContext = createContext(null);
 
-function generateOrderId() {
-  return "CC-" + Math.floor(10000 + Math.random() * 90000);
-}
-
 export function OrderProvider({ children }) {
-  // All orders live in one shared store — the admin panel and each customer's
-  // "My orders" page both read/write here, so a status change is instantly
-  // visible everywhere without needing a real backend yet.
-  const [orders, setOrders] = useLocalStorage("cc_orders", []);
+  const [orders, setOrders] = useState([]); // admin: all orders
+  const [myOrders, setMyOrders] = useState([]); // customer: own orders
+  const [loading, setLoading] = useState(false);
 
-  function placeOrder({
-    userId,
+  async function placeOrder({
     items,
-    subtotal,
-    delivery,
-    address,
+    shippingAddress,
     paymentMethod,
+    deliveryFee = 0,
   }) {
-    const order = {
-      id: generateOrderId(),
-      userId,
+    const res = await api.post("/orders", {
       items,
-      subtotal,
-      delivery,
-      total: subtotal + delivery,
-      address,
+      shippingAddress,
       paymentMethod,
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-    };
-    setOrders((prev) => [order, ...prev]);
+      deliveryFee,
+    });
+    const order = res.data;
+
+    // Safepay is treated as paid instantly in this simulated flow. Cash on
+    // delivery has no Payment record yet — that gets created when the
+    // customer actually pays the courier (a future admin action).
+    if (paymentMethod === "safepay") {
+      try {
+        await api.post("/payments", {
+          orderId: order._id,
+          paymentMethod: "card",
+          amountPaid: order.totalAmount,
+        });
+      } catch (err) {
+        console.error("Failed to record payment:", err.response?.data?.message);
+      }
+    }
+
     return order;
   }
 
-  function updateOrderStatus(orderId, status) {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status } : o)),
-    );
-  }
+  const fetchMyOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/orders/my-orders");
+      setMyOrders(res.data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  function getOrdersForUser(userId) {
-    return orders.filter((o) => o.userId === userId);
+  const fetchAllOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/orders/admin/all");
+      setOrders(res.data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  async function updateOrderStatus(orderId, orderStatus) {
+    const res = await api.put(`/orders/${orderId}/status`, { orderStatus });
+    setOrders((prev) => prev.map((o) => (o._id === orderId ? res.data : o)));
+    return res.data;
   }
 
   return (
     <OrderContext.Provider
-      value={{ orders, placeOrder, updateOrderStatus, getOrdersForUser }}
+      value={{
+        orders,
+        myOrders,
+        loading,
+        placeOrder,
+        fetchMyOrders,
+        fetchAllOrders,
+        updateOrderStatus,
+      }}
     >
       {children}
     </OrderContext.Provider>

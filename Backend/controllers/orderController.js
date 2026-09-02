@@ -1,36 +1,31 @@
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
+import { sendOrderConfirmation } from "../config/mailer.js";
 
 
 export const createOrder = async (req, res) => {
     try {
-        const { items } = req.body;
+        const { items, shippingAddress, paymentMethod, deliveryFee = 0 } = req.body;
 
         if (!items || items.length === 0) {
-            return res.status(400).json(
-                {
-                    message: "Order must contain at least one item"
-                });
+            return res.status(400).json({ message: "Order must contain at least one item" });
+        }
+        if (!shippingAddress) {
+            return res.status(400).json({ message: "Shipping address is required" });
         }
 
-        let totalAmount = 0;
+        let itemsTotal = 0;
         const orderItems = [];
 
         for (const item of items) {
             const product = await Product.findById(item.product);
-
             if (!product) {
-                return res.status(404).json(
-                    {
-                        message: `Product not found: ${item.product}`
-                    });
+                return res.status(404).json({ message: `Product not found: ${item.product}` });
             }
-
             if (product.stock < item.quantity) {
-                return res.status(400).json(
-                    {
-                        message: `Not enough stock for ${product.name}. Available: ${product.stock}`,
-                    });
+                return res.status(400).json({
+                    message: `Not enough stock for ${product.name}. Available: ${product.stock}`,
+                });
             }
             orderItems.push({
                 product: product._id,
@@ -38,23 +33,41 @@ export const createOrder = async (req, res) => {
                 price: product.price,
                 quantity: item.quantity,
             });
-            totalAmount += product.price * item.quantity;
+            itemsTotal += product.price * item.quantity;
             product.stock -= item.quantity;
             await product.save();
         }
-        const order = await Order.create(
-            {
-                user: req.user._id,
-                items: orderItems,
-                totalAmount,
-                orderStatus: "pending",
+        const order = await Order.create({
+            user: req.user._id,
+            items: orderItems,
+            totalAmount: itemsTotal + deliveryFee,
+            deliveryFee,
+            shippingAddress,
+            paymentMethod,
+            orderStatus: "pending",
+        });
+        try {
+            console.log("Sending order confirmation to:", req.user.email);
+            await sendOrderConfirmation({
+                toEmail: req.user.email,
+                customerName: req.user.name,
+                order,
             });
+        } catch (emailError) {
+            console.error("Failed to send order confirmation email:", emailError.message);
+        }
+
         res.status(201).json(order);
     } catch (error) {
-        res.status(500).json(
-            {
-                message: "Server error", error: error.message
-            });
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+export const getAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.find().populate("user", "name email").sort({ createdAt: -1 });
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
@@ -80,23 +93,19 @@ export const getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id).populate("user", "name email");
         if (!order) {
-            return res.status(404).json(
-                {
-                    message: "Order not found"
-                });
+            return res.status(404).json({ message: "Order not found" });
         }
-        if (order.user._id.toString() !== req.user._id.toString()) {
-            return res.status(403).json(
-                {
-                    message: "Not authorized to view this order"
-                });
+
+        const isOwner = order.user._id.toString() === req.user._id.toString();
+        const isAdmin = req.user.role === "admin";
+
+        if (!isOwner && !isAdmin) {
+            return res.status(403).json({ message: "Not authorized to view this order" });
         }
+
         res.status(200).json(order);
     } catch (error) {
-        res.status(500).json(
-            {
-                message: "Server error", error: error.message
-            });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 

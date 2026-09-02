@@ -22,7 +22,11 @@ export default function FilterBar({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
-        <select className="input filter-sort" value={sortBy} onChange={(e) => onSortChange(e.target.value)}>
+        <select
+          className="input filter-sort"
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value)}
+        >
           <option value="newest">Sort: newest</option>
           <option value="price-asc">Price: low to high</option>
           <option value="price-desc">Price: high to low</option>
@@ -39,12 +43,12 @@ export default function FilterBar({
         </button>
         {categories.map((c) => (
           <button
-            key={c.id}
+            key={c._id}
             className={`pill ${activeCategory === c.slug ? "active" : ""}`}
             onClick={() => onCategoryChange(c.slug)}
           >
             <i className={`ti ${c.icon}`} aria-hidden="true"></i>
-            {c.name}
+            {c.categoryName}
           </button>
         ))}
       </div>
