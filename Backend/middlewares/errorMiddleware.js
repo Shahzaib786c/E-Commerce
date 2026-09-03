@@ -22,7 +22,6 @@ export const errorHandler = (err, req, res, next) => {
             .join(", ");
     }
 
-
     if (err.code === 11000) {
         statusCode = 400;
         const field = Object.keys(err.keyValue)[0];

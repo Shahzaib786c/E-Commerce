@@ -128,7 +128,6 @@ export const logoutUser = (req, res) => {
         });
 };
 
-
 export const getMyProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select("-password");
@@ -227,9 +226,10 @@ export const forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(200).json({
-                message: "If an account with that email exists, a reset link has been sent.",
-            });
+            return res.status(200).json(
+                {
+                    message: "If an account with that email exists, a reset link has been sent.",
+                });
         }
 
         // Generate a random raw token, but only store its HASH in the database
@@ -243,7 +243,10 @@ export const forgotPassword = async (req, res) => {
         const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password/${rawToken}`;
 
         try {
-            await sendPasswordResetEmail({ toEmail: user.email, name: user.name, resetUrl });
+            await sendPasswordResetEmail(
+                {
+                    toEmail: user.email, name: user.name, resetUrl
+                });
         } catch (emailError) {
             console.error("Failed to send password reset email:", emailError.message);
         }

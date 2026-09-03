@@ -20,12 +20,18 @@ export const createProduct = async (req, res) => {
         }
 
         if (!name || !price || !stock || !category) {
-            return res.status(400).json({ message: "Missing required product fields" });
+            return res.status(400).json(
+                {
+                    message: "Missing required product fields"
+                });
         }
 
         const categoryExists = await Category.findById(category);
         if (!categoryExists) {
-            return res.status(404).json({ message: "Category not found" });
+            return res.status(404).json(
+                {
+                    message: "Category not found"
+                });
         }
 
         const imageUrl = `/uploads/products/${req.file.filename}`;
@@ -35,26 +41,28 @@ export const createProduct = async (req, res) => {
             ? variants.split(",").map((v) => v.trim()).filter(Boolean)
             : [];
 
-        const product = await Product.create({
-            name,
-            description,
-            price,
-            stock,
-            images: [imageUrl],
-            category,
-            rating,
-            isNewArrival,
-            isBestseller,
-            variants: variantsArray,
-        });
+        const product = await Product.create(
+            {
+                name,
+                description,
+                price,
+                stock,
+                images: [imageUrl],
+                category,
+                rating,
+                isNewArrival,
+                isBestseller,
+                variants: variantsArray,
+            });
 
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json(
+            {
+                message: "Server error", error: error.message
+            });
     }
 };
-
-
 
 export const getProducts = async (req, res) => {
     try {
@@ -70,7 +78,6 @@ export const getProducts = async (req, res) => {
             });
     }
 };
-
 
 export const getProductById = async (req, res) => {
     try {
@@ -96,13 +103,15 @@ export const updateProduct = async (req, res) => {
         if (req.body.category) {
             const categoryExists = await Category.findById(req.body.category);
             if (!categoryExists) {
-                return res.status(404).json({ message: "Category not found" });
+                return res.status(404).json(
+                    {
+                        message: "Category not found"
+                    });
             }
         }
 
         const updateData = { ...req.body };
 
-        // Only overwrite the image if a new file was actually uploaded this time
         if (req.file) {
             updateData.images = [`/uploads/products/${req.file.filename}`];
         }
@@ -112,13 +121,20 @@ export const updateProduct = async (req, res) => {
         });
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json(
+                {
+                    message: "Product not found"
+                });
         }
         res.status(200).json(product);
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        res.status(500).json(
+            {
+                message: "Server error", error: error.message
+            });
     }
 };
+
 export const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
@@ -126,19 +142,16 @@ export const deleteProduct = async (req, res) => {
             return res.status(404).json(
                 {
                     message: "Product not found"
-
                 });
         }
         res.status(200).json(
             {
                 message: "Product deleted successfully"
-
             });
     } catch (error) {
         res.status(500).json(
             {
                 message: "Server error", error: error.message
-
             });
     }
 };

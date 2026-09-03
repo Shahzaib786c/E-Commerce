@@ -36,6 +36,7 @@ export default function CheckoutPage() {
         <div className="empty-state">
           <i className="ti ti-shopping-bag" aria-hidden="true"></i>
           <p>Your cart is empty, nothing to check out yet.</p>
+
           <button
             className="btn btn-primary"
             style={{ marginTop: "var(--sp-3)" }}
@@ -103,6 +104,7 @@ export default function CheckoutPage() {
               <i className="ti ti-map-pin" aria-hidden="true"></i> Shipping
               address
             </p>
+
             <div className="checkout-field-grid">
               <div className="field">
                 <label>Full name</label>
@@ -115,6 +117,7 @@ export default function CheckoutPage() {
                   <p className="error-text">{errors.fullName}</p>
                 )}
               </div>
+
               <div className="field">
                 <label>Phone number</label>
                 <input
@@ -124,6 +127,7 @@ export default function CheckoutPage() {
                 />
                 {errors.phone && <p className="error-text">{errors.phone}</p>}
               </div>
+
               <div className="field checkout-span-2">
                 <label>Street address</label>
                 <input
@@ -133,6 +137,7 @@ export default function CheckoutPage() {
                 />
                 {errors.street && <p className="error-text">{errors.street}</p>}
               </div>
+
               <div className="field">
                 <label>City</label>
                 <input
@@ -142,6 +147,7 @@ export default function CheckoutPage() {
                 />
                 {errors.city && <p className="error-text">{errors.city}</p>}
               </div>
+
               <div className="field">
                 <label>Postal code</label>
                 <input
@@ -192,14 +198,17 @@ export default function CheckoutPage() {
               <span>${(item.price * item.quantity).toLocaleString()}</span>
             </div>
           ))}
+
           <div className="checkout-review-row checkout-delivery-row">
             <span>Delivery</span>
             <span>{delivery === 0 ? "Free" : `$${delivery}`}</span>
           </div>
+
           <div className="checkout-review-row checkout-total-row">
             <span>Total</span>
             <span>${total.toLocaleString()}</span>
           </div>
+
           <button
             className="btn btn-primary btn-block"
             onClick={handlePay}

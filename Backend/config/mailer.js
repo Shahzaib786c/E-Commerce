@@ -3,15 +3,16 @@ import { Resend } from "resend";
 const FROM_ADDRESS = "Cuddle & Co <onboarding@resend.dev>";
 
 export async function sendContactNotification({ name, email, message }) {
-    const resend = new Resend(process.env.RESEND_API_KEY); // created here, not at top of file
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
-        from: FROM_ADDRESS,
-        to: process.env.EMAIL_USER,
-        replyTo: email,
-        subject: `New contact form message from ${name}`,
-        text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
-    });
+    await resend.emails.send(
+        {
+            from: FROM_ADDRESS,
+            to: process.env.EMAIL_USER,
+            replyTo: email,
+            subject: `New contact form message from ${name}`,
+            text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        });
 }
 
 export async function sendOrderConfirmation({ toEmail, customerName, order }) {
@@ -52,11 +53,12 @@ Thanks for shopping with Cuddle & Co!`,
 export async function sendPasswordResetEmail({ toEmail, name, resetUrl }) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
-        from: FROM_ADDRESS,
-        to: toEmail,
-        subject: "Reset your Cuddle & Co password",
-        text: `Hi ${name},
+    await resend.emails.send(
+        {
+            from: FROM_ADDRESS,
+            to: toEmail,
+            subject: "Reset your Cuddle & Co password",
+            text: `Hi ${name},
 
 We received a request to reset your password. Click the link below to choose a new one:
 
@@ -66,5 +68,5 @@ This link expires in 30 minutes. If you didn't request this, you can safely igno
 
 Thanks,
 Cuddle & Co`,
-    });
+        });
 }

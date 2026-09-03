@@ -50,6 +50,7 @@ export default function CustomerViewPage() {
         >
           {customer.email} · {customer.role}
         </p>
+
         <p
           style={{
             fontSize: "var(--fs-xs)",
@@ -59,6 +60,7 @@ export default function CustomerViewPage() {
         >
           Joined {new Date(customer.createdAt).toLocaleDateString()}
         </p>
+
         <Link
           to={`/admin/customers/${id}/edit`}
           className="btn btn-primary btn-sm"

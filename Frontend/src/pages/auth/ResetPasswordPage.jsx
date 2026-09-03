@@ -73,6 +73,7 @@ export default function ResetPasswordPage() {
       >
         Set a new password
       </p>
+
       <p
         style={{
           fontSize: "var(--fs-sm)",
@@ -97,6 +98,7 @@ export default function ResetPasswordPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+
         <div className="field">
           <label>Confirm new password</label>
           <input

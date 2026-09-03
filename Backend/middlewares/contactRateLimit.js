@@ -1,4 +1,3 @@
-// middlewares/contactRateLimit.js
 import rateLimit from "express-rate-limit";
 
 export const contactLimiter = rateLimit({

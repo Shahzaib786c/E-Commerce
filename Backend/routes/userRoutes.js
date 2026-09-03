@@ -9,22 +9,23 @@ import {
     updateUserRole,
     forgotPassword, resetPassword
 } from '../controllers/userController.js';
+
 import { protect } from '../middlewares/authMiddleware.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 
 
 const router = express.Router();
 
+
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
-
 router.get('/me', protect, getMyProfile);
 router.get('/', protect, isAdmin, getAllUsers);
 router.get('/:id', protect, isAdmin, getUserById);
 router.put('/:id/role', protect, isAdmin, updateUserRole);
-
 router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:token', resetPassword);
+
 
 export default router;
