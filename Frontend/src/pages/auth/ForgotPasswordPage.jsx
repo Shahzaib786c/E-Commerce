@@ -99,7 +99,10 @@ export default function ForgotPasswordPage() {
       >
         <Link
           to="/auth/login"
-          style={{ color: "var(--color-rose)", fontWeight: 700 }}
+          style={{
+            color: "var(--color-rose)",
+            fontWeight: 700,
+          }}
         >
           Back to log in
         </Link>

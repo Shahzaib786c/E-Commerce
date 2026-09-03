@@ -34,7 +34,11 @@ const orderSchema = new mongoose.Schema(
         deliveryFee: { type: Number, default: 0 },
         shippingAddress: {
             fullName: { type: String, required: true },
-            phone: { type: String, required: true },
+            phone: {
+                type: String,
+                required: true,
+                match: [/^[\d\s\-+()]{7,20}$/, "Please provide a valid phone number"],
+            },
             street: { type: String, required: true },
             city: { type: String, required: true },
             postalCode: { type: String },

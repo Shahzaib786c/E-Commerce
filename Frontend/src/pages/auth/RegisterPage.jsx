@@ -9,7 +9,6 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phone: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -80,15 +79,7 @@ export default function RegisterPage() {
             onChange={(e) => update("email", e.target.value)}
           />
         </div>
-        <div className="field">
-          <label>Phone number</label>
-          <input
-            className="input"
-            required
-            value={form.phone}
-            onChange={(e) => update("phone", e.target.value)}
-          />
-        </div>
+
         <div className="field">
           <label>Password</label>
           <input

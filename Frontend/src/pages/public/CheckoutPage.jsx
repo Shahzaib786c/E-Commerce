@@ -55,13 +55,16 @@ export default function CheckoutPage() {
   function validate() {
     const errs = {};
     if (!address.fullName.trim()) errs.fullName = "Required";
-    if (!address.phone.trim()) errs.phone = "Required";
+    if (!address.phone.trim()) {
+      errs.phone = "Required";
+    } else if (!/^[\d\s\-+()]{7,20}$/.test(address.phone.trim())) {
+      errs.phone = "Please enter a valid phone number";
+    }
     if (!address.street.trim()) errs.street = "Required";
     if (!address.city.trim()) errs.city = "Required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
-
   async function handlePay() {
     if (!validate()) return;
     setProcessing(true);

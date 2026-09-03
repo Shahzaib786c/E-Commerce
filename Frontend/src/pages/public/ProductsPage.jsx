@@ -28,7 +28,6 @@ export default function ProductsPage() {
   }
 
   const filtered = useMemo(() => {
-    console.log("Sample product:", products[0]);
     let list = [...products];
     if (activeCategory !== "all") {
       list = list.filter((p) => p.category?.slug === activeCategory);

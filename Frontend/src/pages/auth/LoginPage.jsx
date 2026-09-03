@@ -116,9 +116,7 @@ export default function LoginPage() {
           textAlign: "center",
           marginTop: "var(--sp-3)",
         }}
-      >
-        Demo
-      </p>
+      ></p>
     </>
   );
 }
