@@ -14,14 +14,20 @@ const categorySchema = new mongoose.Schema(
             trim: true,
         },
         icon: {
-            type: String, // Tabler icon class, e.g. "ti-paw"
+            type: String,
             default: "",
         },
         description: {
             type: String,
         },
+        isActive: {
+            type: Boolean,
+            default: true,
+        },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+    }
 );
 
 export default mongoose.model("Category", categorySchema);

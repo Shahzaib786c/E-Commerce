@@ -67,9 +67,26 @@ export const createProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
     try {
         const { category } = req.query;
-        const filter = category ? { category } : {};
 
-        const products = await Product.find(filter).populate("category", "categoryName slug");
+        let filter = {};
+
+        if (category) {
+            // If a specific category was requested, check it's actually active first
+            const requestedCategory = await Category.findOne(
+                {
+                    _id: category, isActive: true
+                });
+            if (!requestedCategory) {
+                return res.status(200).json([]); // inactive or nonexistent category → no products shown
+            }
+            filter.category = category;
+        } else {
+            // No specific category requested — exclude all products under any inactive category
+            const inactiveCategories = await Category.find({ isActive: false }).select("_id");
+            filter.category = { $nin: inactiveCategories.map((c) => c._id) };
+        }
+
+        const products = await Product.find(filter).populate("category", "categoryName slug icon");
         res.status(200).json(products);
     } catch (error) {
         res.status(500).json(
@@ -78,6 +95,7 @@ export const getProducts = async (req, res) => {
             });
     }
 };
+
 
 export const getProductById = async (req, res) => {
     try {
@@ -94,6 +112,18 @@ export const getProductById = async (req, res) => {
             {
                 message: "Server error", error: error.message
 
+            });
+    }
+};
+
+export const getAllProductsAdmin = async (req, res) => {
+    try {
+        const products = await Product.find().populate("category", "categoryName slug icon").sort({ createdAt: -1 });
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json(
+            {
+                message: "Server error", error: error.message
             });
     }
 };
