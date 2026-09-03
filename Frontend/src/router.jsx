@@ -23,6 +23,7 @@ import NotFoundPage from "./pages/public/NotFoundPage.jsx";
 import LoginPage from "./pages/auth/LoginPage.jsx";
 import RegisterPage from "./pages/auth/RegisterPage.jsx";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage.jsx"; // add this line
 
 // Admin pages
 import DashboardPage from "./pages/admin/DashboardPage.jsx";
@@ -36,7 +37,6 @@ import ProductViewPage from "./pages/admin/ProductViewPage.jsx";
 import OrdersListPage from "./pages/admin/OrdersListPage.jsx";
 import OrderViewEditPage from "./pages/admin/OrderViewEditPage.jsx";
 import CustomersListPage from "./pages/admin/CustomersListPage.jsx";
-import CustomerAddPage from "./pages/admin/CustomerAddPage.jsx";
 import CustomerEditPage from "./pages/admin/CustomerEditPage.jsx";
 import CustomerViewPage from "./pages/admin/CustomerViewPage.jsx";
 
@@ -111,6 +111,10 @@ const router = createBrowserRouter([
         path: "forgot",
         element: <ForgotPasswordPage />,
       },
+      {
+        path: "reset-password/:token",
+        element: <ResetPasswordPage />,
+      },
     ],
   },
 
@@ -168,10 +172,6 @@ const router = createBrowserRouter([
           {
             path: "customers",
             element: <CustomersListPage />,
-          },
-          {
-            path: "customers/add",
-            element: <CustomerAddPage />,
           },
           {
             path: "customers/:id",

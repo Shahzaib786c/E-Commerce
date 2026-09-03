@@ -9,18 +9,12 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
-import  path from "path";
+import path from "path";
 import contactRoutes from './routes/contactRoutes.js';
-
 dotenv.config();
 
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
-
 const app = express();
-
 connectDB();
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -30,16 +24,13 @@ app.use(
     })
 );
 
-
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/contact', contactRoutes);
- app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(notFound);
 app.use(errorHandler);

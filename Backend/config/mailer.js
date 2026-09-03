@@ -47,3 +47,24 @@ We'll notify you again once your order ships.
 Thanks for shopping with Cuddle & Co!`,
     });
 }
+
+
+export async function sendPasswordResetEmail({ toEmail, name, resetUrl }) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+        from: FROM_ADDRESS,
+        to: toEmail,
+        subject: "Reset your Cuddle & Co password",
+        text: `Hi ${name},
+
+We received a request to reset your password. Click the link below to choose a new one:
+
+${resetUrl}
+
+This link expires in 30 minutes. If you didn't request this, you can safely ignore this email.
+
+Thanks,
+Cuddle & Co`,
+    });
+}
