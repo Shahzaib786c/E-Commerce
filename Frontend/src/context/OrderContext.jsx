@@ -5,7 +5,7 @@ const OrderContext = createContext(null);
 
 export function OrderProvider({ children }) {
   const [orders, setOrders] = useState([]); // admin: all orders
-  const [myOrders, setMyOrders] = useState([]); // customer: own orders
+  const [myOrders, setMyOrders] = useState([]); // customer: their own orders
   const [loading, setLoading] = useState(false);
 
   async function placeOrder({

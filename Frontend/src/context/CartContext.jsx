@@ -28,7 +28,7 @@ export function CartProvider({ children }) {
           productId: product._id,
           name: product.name,
           price: product.price,
-          image: product.images?.[0] || null, // raw path, converted to full URL at render time
+          image: product.images?.[0] || null, 
           category: product.category?.slug || product.category,
           variant,
           quantity,

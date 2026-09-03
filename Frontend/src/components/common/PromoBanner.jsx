@@ -23,6 +23,7 @@ export default function PromoBanner({
           playsInline
         />
       )}
+
       <div className="promo-overlay" />
 
       <div className="promo-content">
@@ -37,7 +38,9 @@ export default function PromoBanner({
           )}
         </div>
 
-        {!videoSrc && <i className={`ti ${icon} promo-icon`} aria-hidden="true"></i>}
+        {!videoSrc && (
+          <i className={`ti ${icon} promo-icon`} aria-hidden="true"></i>
+        )}
       </div>
     </div>
   );

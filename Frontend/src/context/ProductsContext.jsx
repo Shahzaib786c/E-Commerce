@@ -30,10 +30,11 @@ export function ProductsProvider({ children }) {
   }, []);
 
   async function addProduct(formData) {
-    // formData must be a real FormData object (includes the image file) — see note below
+    // formData must be a real FormData object (includes the image file)
     const res = await api.post("/products", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    
     setProducts((prev) => [...prev, res.data]);
     return res.data._id;
   }

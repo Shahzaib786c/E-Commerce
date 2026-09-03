@@ -22,7 +22,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
     initialValues || { ...EMPTY, category: categories[0]?._id || "" },
   );
   const [variantInput, setVariantInput] = useState("");
-  const [imageFile, setImageFile] = useState(null); // the new file, if the admin picks one
+  const [imageFile, setImageFile] = useState(null); 
   const [existingImage, setExistingImage] = useState(
     initialValues?.images?.[0] || null,
   ); // for edit mode

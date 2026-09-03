@@ -14,6 +14,7 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
   const [form, setForm] = useState(
     initialValues || { categoryName: "", slug: "", icon: "ti-hearts" },
   );
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -50,6 +51,7 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
           onChange={(e) => update("categoryName", e.target.value)}
         />
       </div>
+
       <div className="field" style={{ marginBottom: "var(--sp-3)" }}>
         <label>Slug</label>
         <input
@@ -58,6 +60,7 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
           onChange={(e) => update("slug", e.target.value)}
         />
       </div>
+
       <div className="field" style={{ marginBottom: "var(--sp-4)" }}>
         <label>Icon</label>
         <select
@@ -72,11 +75,13 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
           ))}
         </select>
       </div>
+
       {error && (
         <p className="error-text" style={{ marginBottom: "var(--sp-3)" }}>
           {error}
         </p>
       )}
+
       <div style={{ display: "flex", gap: "var(--sp-2)" }}>
         <button
           type="button"
@@ -86,6 +91,7 @@ export default function CategoryForm({ initialValues, onSubmit, submitLabel }) {
         >
           Cancel
         </button>
+
         <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
           {submitLabel}
         </button>

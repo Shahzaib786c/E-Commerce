@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./FlashSaleTimer.css";
 
-// Countdown target: rolls forward to the next midnight + 8h whenever it expires,
-// so the timer always shows a live, ticking countdown without ever going stale.
 function getNextDeadline() {
   const now = new Date();
   const deadline = new Date(now);
-  deadline.setHours(24, 0, 0, 0); // next midnight
-  deadline.setHours(deadline.getHours() + 8); // sale actually ends 8am the day after
+  deadline.setHours(24, 0, 0, 0);
+  deadline.setHours(deadline.getHours() + 8);
   return deadline;
 }
 

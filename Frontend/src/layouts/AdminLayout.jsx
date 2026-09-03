@@ -24,7 +24,9 @@ export default function AdminLayout() {
               key={item.to}
               to={item.to}
               end={item.end}
-              className={({ isActive }) => `admin-nav-item ${isActive ? "active" : ""}`}
+              className={({ isActive }) =>
+                `admin-nav-item ${isActive ? "active" : ""}`
+              }
             >
               <i className={`ti ${item.icon}`} aria-hidden="true"></i>
               {item.label}
@@ -32,11 +34,13 @@ export default function AdminLayout() {
           ))}
         </nav>
       </aside>
+
       <div className="admin-main">
         <header className="admin-topbar">
           <span />
           <div className="admin-topbar-user">
             <span>{user?.name}</span>
+
             <button
               className="btn btn-ghost btn-sm"
               onClick={() => {
@@ -48,6 +52,7 @@ export default function AdminLayout() {
             </button>
           </div>
         </header>
+
         <div className="admin-content">
           <Outlet />
         </div>

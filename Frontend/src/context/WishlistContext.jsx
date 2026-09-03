@@ -8,7 +8,7 @@ export function WishlistProvider({ children }) {
   const { user } = useAuth();
   const wishlistKey = `cc_wishlist_${user?._id || "guest"}`;
 
-  // Guests can use the wishlist freely — no login required, unlike checkout.
+  // Guests can use the wishlist freely where no login required, unlike checkout.
   const [productIds, setProductIds] = useLocalStorage(wishlistKey, []);
 
   function toggle(productId) {

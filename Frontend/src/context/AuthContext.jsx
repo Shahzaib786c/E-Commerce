@@ -14,7 +14,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   // Real registered users, fetched from the backend — replaces the old
-  // seedCustomers/localStorage approach entirely.
   const [customers, setCustomers] = useState([]);
 
   useEffect(() => {

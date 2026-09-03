@@ -82,13 +82,16 @@ export default function ProductCard({ product }) {
           </span>
         )}
       </div>
+
       <div className="product-card-body">
         <p className="product-card-name">{product.name}</p>
         <div className="product-card-rating">
           <i className="ti ti-star" aria-hidden="true"></i>
           <span>{product.rating}</span>
         </div>
+
         <p className="product-card-price">${product.price.toLocaleString()}</p>
+
         <button
           className="btn btn-primary btn-sm btn-block"
           disabled={outOfStock}

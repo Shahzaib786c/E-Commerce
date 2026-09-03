@@ -14,6 +14,7 @@ export default function FilterBar({
       <div className="filter-row">
         <div className="filter-search">
           <i className="ti ti-search" aria-hidden="true"></i>
+
           <input
             type="text"
             className="input"
@@ -22,6 +23,7 @@ export default function FilterBar({
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
+
         <select
           className="input filter-sort"
           value={sortBy}

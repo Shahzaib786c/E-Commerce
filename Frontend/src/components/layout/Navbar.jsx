@@ -21,7 +21,6 @@ export default function Navbar() {
 
   const cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
-  // Bahar click hone par dropdown band kar do
   useEffect(() => {
     function handleClickOutside(e) {
       if (catRef.current && !catRef.current.contains(e.target)) {
@@ -46,14 +45,17 @@ export default function Navbar() {
           <Link to="/" onClick={() => setMobileOpen(false)}>
             Home
           </Link>
+
           <Link to="/products" onClick={() => setMobileOpen(false)}>
             Shop
           </Link>
+
           <div className="navbar-dropdown" ref={catRef}>
             <span onClick={() => setCatOpen((o) => !o)}>
               Categories{" "}
               <i className="ti ti-chevron-down" aria-hidden="true"></i>
             </span>
+
             {catOpen && (
               <div className="dropdown-menu">
                 {categories.map((c) => (
@@ -71,9 +73,11 @@ export default function Navbar() {
               </div>
             )}
           </div>
+
           <Link to="/about" onClick={() => setMobileOpen(false)}>
             About
           </Link>
+
           <Link to="/contact" onClick={() => setMobileOpen(false)}>
             Contact
           </Link>
@@ -86,10 +90,12 @@ export default function Navbar() {
               <span className="icon-badge">{productIds.length}</span>
             )}
           </Link>
+
           <Link to="/cart" className="icon-btn" aria-label="Cart">
             <i className="ti ti-shopping-bag" aria-hidden="true"></i>
             {cartCount > 0 && <span className="icon-badge">{cartCount}</span>}
           </Link>
+
           <div className="navbar-dropdown" ref={accRef}>
             <button
               className="icon-btn"
@@ -98,6 +104,7 @@ export default function Navbar() {
             >
               <i className="ti ti-user" aria-hidden="true"></i>
             </button>
+
             {accOpen && (
               <div className="dropdown-menu dropdown-menu-right">
                 {isLoggedIn ? (
