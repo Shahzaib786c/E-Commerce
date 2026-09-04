@@ -38,8 +38,9 @@ export const registerUser = async (req, res) => {
     const token = generateToken(user._id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // must be true when sameSite is "none" — browsers reject it otherwise
+      secure: true,
       sameSite: "none",
+      partitioned: true, // required by Chrome's newer third-party cookie restrictions
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -87,8 +88,9 @@ export const loginUser = async (req, res) => {
     const token = generateToken(user._id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // must be true when sameSite is "none" — browsers reject it otherwise
+      secure: true,
       sameSite: "none",
+      partitioned: true, // required by Chrome's newer third-party cookie restrictions
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.status(200).json({
@@ -110,6 +112,7 @@ export const logoutUser = (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    partitioned: true,
   });
   res.status(200).json({
     message: "Logged out successfully",
