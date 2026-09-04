@@ -20,6 +20,7 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   const { products, categories } = useProducts();
+
   const bestsellers = products.filter((p) => p.isBestseller).slice(0, 4);
 
   return (
@@ -31,12 +32,12 @@ export default function HomePage() {
         <div className="category-grid">
           {categories.map((c) => (
             <Link
-              key={c.id}
+              key={c._id}
               to={`/products?category=${c.slug}`}
               className="category-tile"
             >
               <i className={`ti ${c.icon}`} aria-hidden="true"></i>
-              <span>{c.name}</span>
+              <span>{c.categoryName}</span>
             </Link>
           ))}
         </div>
@@ -51,7 +52,7 @@ export default function HomePage() {
         </div>
         <div className="products-grid">
           {bestsellers.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p._id} product={p} />
           ))}
         </div>
       </section>

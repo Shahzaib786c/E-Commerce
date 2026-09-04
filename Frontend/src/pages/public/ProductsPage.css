@@ -12,6 +12,16 @@
   gap: var(--sp-4);
   margin-bottom: var(--sp-6);
 }
+.products-fade-wrap {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  min-height: 200px; /* prevents the page height from collapsing/jumping while empty during a transition */
+}
+
+.products-fade-wrap.is-fetching {
+  opacity: 0.4;
+  pointer-events: none; /* prevents clicking a product card mid-transition */
+}
 .pagination {
   display: flex;
   align-items: center;

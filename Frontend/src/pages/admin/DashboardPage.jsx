@@ -17,19 +17,20 @@ const STATUS_CLASS = {
 const LOW_STOCK_THRESHOLD = 5;
 
 export default function DashboardPage() {
-  const { products } = useProducts();
+  const { adminProducts, fetchAllProductsAdmin } = useProducts();
   const { orders, fetchAllOrders } = useOrders();
   const { customers, fetchCustomers } = useAuth();
 
   useEffect(() => {
     fetchAllOrders();
     fetchCustomers();
+    fetchAllProductsAdmin();
   }, [fetchAllOrders, fetchCustomers]);
 
   const revenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
   const avgOrderValue = orders.length > 0 ? revenue / orders.length : 0;
   const pendingCount = orders.filter((o) => o.orderStatus === "pending").length;
-  const lowStockProducts = products.filter(
+  const lowStockProducts = adminProducts.filter(
     (p) => p.stock > 0 && p.stock <= LOW_STOCK_THRESHOLD,
   );
 

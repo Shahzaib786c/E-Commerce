@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { getImageUrl } from "../../api/imageUrl.js";
@@ -17,15 +17,20 @@ const EMPTY = {
 };
 
 export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
-  const { categories } = useProducts();
+  const { adminCategories, fetchAllCategoriesAdmin } = useProducts();
+
+  useEffect(() => {
+    fetchAllCategoriesAdmin();
+  }, []);
+
   const [form, setForm] = useState(
-    initialValues || { ...EMPTY, category: categories[0]?._id || "" },
+    initialValues || { ...EMPTY, category: adminCategories[0]?._id || "" },
   );
   const [variantInput, setVariantInput] = useState("");
-  const [imageFile, setImageFile] = useState(null); 
+  const [imageFile, setImageFile] = useState(null);
   const [existingImage, setExistingImage] = useState(
     initialValues?.images?.[0] || null,
-  ); // for edit mode
+  );
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
@@ -75,7 +80,6 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
     e.preventDefault();
     if (!validate()) return;
 
-    // Build a real FormData object — required for multer to receive the file
     const formData = new FormData();
     formData.append("name", form.name);
     formData.append("description", form.description);
@@ -85,10 +89,10 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
     formData.append("rating", form.rating || 0);
     formData.append("isNewArrival", form.isNewArrival);
     formData.append("isBestseller", form.isBestseller);
-    formData.append("variants", form.variants.join(",")); // backend splits this string back into an array
+    formData.append("variants", form.variants.join(","));
 
     if (imageFile) {
-      formData.append("image", imageFile); // only attach if a NEW file was picked
+      formData.append("image", imageFile);
     }
 
     onSubmit(formData);
@@ -119,9 +123,10 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
               value={form.category}
               onChange={(e) => update("category", e.target.value)}
             >
-              {categories.map((c) => (
+              {adminCategories.map((c) => (
                 <option key={c._id} value={c._id}>
                   {c.categoryName}
+                  {c.isActive === false ? " (Inactive)" : ""}
                 </option>
               ))}
             </select>
@@ -267,7 +272,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
                   color: "var(--color-plum-soft)",
                 }}
               >
-                {categories.find((c) => c._id === form.category)
+                {adminCategories.find((c) => c._id === form.category)
                   ?.categoryName || "Category"}{" "}
                 · ${form.price || 0}
               </p>

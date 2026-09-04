@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
@@ -7,13 +8,30 @@ import DataTable from "../../components/admin/DataTable.jsx";
 import ProductImagePlaceholder from "../../components/product/ProductImagePlaceholder.jsx";
 
 export default function ProductsListPage() {
-  const { products, deleteProduct } = useProducts();
+  const {
+    adminProducts,
+    deleteProduct,
+    fetchAllProductsAdmin,
+    updateProductStatus,
+  } = useProducts();
   const { showToast } = useToast();
+
+  useEffect(() => {
+    fetchAllProductsAdmin();
+  }, []);
 
   function handleDelete(p) {
     if (window.confirm(`Delete "${p.name}"? This can't be undone.`)) {
       deleteProduct(p._id);
       showToast("Product deleted");
+    }
+  }
+  async function handleStatusChange(row, isActive) {
+    try {
+      await updateProductStatus(row._id, isActive);
+      showToast(`${row.name} ${isActive ? "activated" : "deactivated"}`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to update status");
     }
   }
 
@@ -41,7 +59,16 @@ export default function ProductsListPage() {
     {
       key: "category",
       label: "Category",
-      render: (row) => row.category?.categoryName || "—",
+      render: (row) => (
+        <>
+          {row.category?.categoryName || "—"}
+          {row.category?.isActive === false && (
+            <span className="badge badge-out" style={{ marginLeft: 6 }}>
+              Hidden
+            </span>
+          )}
+        </>
+      ),
     },
     {
       key: "price",
@@ -57,6 +84,20 @@ export default function ProductsListPage() {
         ) : (
           row.stock
         ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (row) => (
+        <select
+          className="input status-select"
+          value={row.isActive ? "active" : "inactive"}
+          onChange={(e) => handleStatusChange(row, e.target.value === "active")}
+        >
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      ),
     },
     {
       key: "actions",
@@ -84,7 +125,7 @@ export default function ProductsListPage() {
         addLink="/admin/products/add"
         addLabel="Add product"
       />
-      <DataTable columns={columns} rows={products} rowKey="_id" />
+      <DataTable columns={columns} rows={adminProducts} rowKey="_id" />
     </div>
   );
 }

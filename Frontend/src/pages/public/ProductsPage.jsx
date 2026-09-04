@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
+import api from "../../api/axios.js";
 import ProductCard from "../../components/product/ProductCard.jsx";
 import FilterBar from "../../components/filters/FilterBar.jsx";
 import PromoBanner from "../../components/common/PromoBanner.jsx";
@@ -10,13 +11,34 @@ import product from "./product.mp4";
 const PAGE_SIZE = 8;
 
 export default function ProductsPage() {
-  const { products, categories, loading, error } = useProducts();
+  const { categories } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState("");
+
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [page, setPage] = useState(1);
 
+  const [products, setProducts] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // isInitialLoading = the very first load (nothing to show yet, so a text/skeleton state is fine)
+  // isFetching = any load AFTER the first (previous results stay visible, just dimmed)
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
+  const [error, setError] = useState(null);
+  const hasLoadedOnce = useRef(false);
+
   const activeCategory = searchParams.get("category") || "all";
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   function setActiveCategory(slug) {
     setPage(1);
@@ -27,40 +49,29 @@ export default function ProductsPage() {
     }
   }
 
-  const filtered = useMemo(() => {
-    let list = [...products];
-    if (activeCategory !== "all") {
-      list = list.filter((p) => p.category?.slug === activeCategory);
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setIsFetching(true);
+        setError(null);
+        const params = { page, limit: PAGE_SIZE, sort: sortBy };
+        if (activeCategory !== "all") params.category = activeCategory;
+        if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
+
+        const res = await api.get("/products", { params });
+        setProducts(res.data.products);
+        setTotalCount(res.data.totalCount);
+        setTotalPages(res.data.totalPages || 1);
+        hasLoadedOnce.current = true;
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load products");
+      } finally {
+        setIsFetching(false);
+        setIsInitialLoading(false);
+      }
     }
-    if (search.trim()) {
-      list = list.filter((p) =>
-        p.name.toLowerCase().includes(search.trim().toLowerCase()),
-      );
-    }
-    if (sortBy === "price-asc") list.sort((a, b) => a.price - b.price);
-    else if (sortBy === "price-desc") list.sort((a, b) => b.price - a.price);
-    else if (sortBy === "popular") list.sort((a, b) => b.rating - a.rating);
-    return list;
-  }, [products, activeCategory, search, sortBy]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  if (loading) {
-    return (
-      <div className="container products-page">
-        <p className="results-count">Loading products...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container products-page">
-        <p className="results-count">Something went wrong: {error}</p>
-      </div>
-    );
-  }
+    fetchProducts();
+  }, [activeCategory, debouncedSearch, sortBy, page]);
 
   return (
     <div className="container products-page">
@@ -76,56 +87,71 @@ export default function ProductsPage() {
         categories={categories}
         activeCategory={activeCategory}
         onCategoryChange={setActiveCategory}
-        search={search}
-        onSearchChange={(v) => {
-          setSearch(v);
+        search={searchInput}
+        onSearchChange={setSearchInput}
+        sortBy={sortBy}
+        onSortChange={(v) => {
+          setSortBy(v);
           setPage(1);
         }}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
       />
 
-      <p className="results-count">{filtered.length} products found</p>
-
-      {pageItems.length === 0 ? (
-        <div className="empty-state">
-          <i className="ti ti-mood-sad" aria-hidden="true"></i>
-          <p>No products found. Try a different search or category.</p>
-        </div>
+      {isInitialLoading ? (
+        <p className="results-count">Loading products...</p>
+      ) : error ? (
+        <p className="results-count">Something went wrong: {error}</p>
       ) : (
-        <div className="products-grid">
-          {pageItems.map((p) => (
-            <ProductCard key={p._id} product={p} />
-          ))}
-        </div>
-      )}
+        <>
+          <p className="results-count">{totalCount} products found</p>
 
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            className="btn btn-secondary btn-sm"
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
+          {/* This wrapper never unmounts between fetches — only its opacity changes.
+              That's what removes the jump-cut/flash: the grid stays in place and
+              fades, instead of disappearing and being replaced. */}
+          <div
+            className={`products-fade-wrap ${isFetching ? "is-fetching" : ""}`}
           >
-            <i className="ti ti-chevron-left" aria-hidden="true"></i>
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-            <button
-              key={n}
-              className={`btn btn-sm ${n === page ? "btn-primary" : "btn-secondary"}`}
-              onClick={() => setPage(n)}
-            >
-              {n}
-            </button>
-          ))}
-          <button
-            className="btn btn-secondary btn-sm"
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            <i className="ti ti-chevron-right" aria-hidden="true"></i>
-          </button>
-        </div>
+            {products.length === 0 ? (
+              <div className="empty-state">
+                <i className="ti ti-mood-sad" aria-hidden="true"></i>
+                <p>No products found. Try a different search or category.</p>
+              </div>
+            ) : (
+              <div className="products-grid">
+                {products.map((p) => (
+                  <ProductCard key={p._id} product={p} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="btn btn-secondary btn-sm"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                <i className="ti ti-chevron-left" aria-hidden="true"></i>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  className={`btn btn-sm ${n === page ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => setPage(n)}
+                >
+                  {n}
+                </button>
+              ))}
+              <button
+                className="btn btn-secondary btn-sm"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                <i className="ti ti-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

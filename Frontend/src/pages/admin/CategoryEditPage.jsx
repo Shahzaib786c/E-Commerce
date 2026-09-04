@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useNavigate, Navigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
@@ -6,11 +7,16 @@ import CategoryForm from "../../components/admin/CategoryForm.jsx";
 
 export default function CategoryEditPage() {
   const { id } = useParams();
-  const { categories, updateCategory } = useProducts();
+  const { adminCategories, updateCategory, fetchAllCategoriesAdmin } =
+    useProducts();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const category = categories.find((c) => c._id === id);
+  useEffect(() => {
+    fetchAllCategoriesAdmin();
+  }, []);
+
+  const category = adminCategories.find((c) => c._id === id);
   if (!category) return <Navigate to="/admin/categories" replace />;
 
   async function handleSubmit(form) {

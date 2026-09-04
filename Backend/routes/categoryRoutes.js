@@ -14,7 +14,7 @@ import { isAdmin } from '../middlewares/isAdmin.js';
 
 const router = express.Router();
 
-router.get('/admin/all', protect, isAdmin, getAllCategoriesAdmin); // must come BEFORE /:id
+router.get('/admin/all', protect, isAdmin, getAllCategoriesAdmin);
 router.get('/', getCategories);
 router.get('/:id', getCategoryById);
 router.post('/', protect, isAdmin, createCategory);

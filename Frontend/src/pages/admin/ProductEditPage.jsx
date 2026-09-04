@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useNavigate, Navigate } from "react-router";
 import { useProducts } from "../../context/ProductsContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
@@ -6,16 +7,17 @@ import ProductForm from "../../components/admin/ProductForm.jsx";
 
 export default function ProductEditPage() {
   const { id } = useParams();
-  const { products, updateProduct } = useProducts();
+  const { adminProducts, updateProduct, fetchAllProductsAdmin } = useProducts();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const product = products.find((p) => p._id === id);
+  useEffect(() => {
+    fetchAllProductsAdmin();
+  }, []);
+
+  const product = adminProducts.find((p) => p._id === id);
   if (!product) return <Navigate to="/admin/products" replace />;
 
-  // ProductForm's category <select> needs a plain _id string to match its
-  // <option value={c._id}>, but `product.category` is now a populated object
-  // ({ _id, categoryName, slug, icon }) — unwrap it before handing it down.
   const initialValues = {
     ...product,
     category: product.category?._id || "",

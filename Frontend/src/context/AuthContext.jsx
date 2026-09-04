@@ -6,15 +6,15 @@ import {
   useCallback,
 } from "react";
 import api from "../api/axios.js";
+import { useToast } from "./ToastContext.jsx";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Real registered users, fetched from the backend — replaces the old
   const [customers, setCustomers] = useState([]);
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function checkAuth() {
@@ -23,6 +23,11 @@ export function AuthProvider({ children }) {
         setUser(res.data);
       } catch (err) {
         setUser(null);
+        if (err.response?.status === 403) {
+          showToast(
+            err.response.data?.message || "Your account has been deactivated.",
+          );
+        }
       } finally {
         setLoading(false);
       }
@@ -67,15 +72,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  // Admin-only: fetch every real registered user
   const fetchCustomers = useCallback(async () => {
     const res = await api.get("/users");
     setCustomers(res.data);
   }, []);
 
-  // Admin-only: promote/demote a user's role
   async function updateCustomerRole(id, role) {
     const res = await api.put(`/users/${id}/role`, { role });
+    setCustomers((prev) => prev.map((c) => (c._id === id ? res.data : c)));
+    return res.data;
+  }
+
+  async function updateCustomerStatus(id, isActive) {
+    const res = await api.put(`/users/${id}/status`, { isActive });
     setCustomers((prev) => prev.map((c) => (c._id === id ? res.data : c)));
     return res.data;
   }
@@ -93,6 +102,7 @@ export function AuthProvider({ children }) {
         logout,
         fetchCustomers,
         updateCustomerRole,
+        updateCustomerStatus,
       }}
     >
       {children}
