@@ -69,3 +69,16 @@
     text-align: center;
   }
 }
+
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-6);
+  }
+  .footer-newsletter {
+    flex-direction: column;
+  }
+  .footer-newsletter button {
+    width: 100%;
+  }
+}

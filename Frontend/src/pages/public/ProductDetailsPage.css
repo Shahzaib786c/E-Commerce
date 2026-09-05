@@ -180,67 +180,98 @@
 
 /* ---- 100% MATCHED PRODUCT DETAIL WISHLIST BUTTON FIX ---- */
 
-/* 1. Base button layout alignment */
 .btn.details-wishlist-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #ffffff !important;
-  /* Hamesha solid pure white background */
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
   color: var(--color-rose, #e07a5f) !important;
-  /* Default khali dil ka stroke color */
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   padding: 10px 16px;
-  /* Standard clickable spacing */
 }
 
-/* Base style inside button for both SVGs */
 .btn.details-wishlist-btn svg {
   display: inline-block;
   vertical-align: middle;
   transition: transform 0.2s ease;
 }
 
-/* Hover effect micro-interaction */
 .btn.details-wishlist-btn:hover {
   transform: scale(1.03);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* 2. ACTIVE STATE HANDLING (Jab product wishlist mein ho) */
-/* Jab button par "is-active" class lag jaye, to andar ke SVG ka fill aur color theme ke mutabiq laal ho jaye */
 .btn.details-wishlist-btn.is-active {
   color: var(--color-rose, #e07a5f) !important;
 }
 
 .btn.details-wishlist-btn.is-active svg {
   fill: var(--color-rose, #e07a5f) !important;
-  /* Pure solid deep rose fill */
   stroke: var(--color-rose, #e07a5f) !important;
-  /* Seamless outlines */
   animation: detailHeartPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Micro animation for detail page active trigger */
 @keyframes detailHeartPop {
   0% {
     transform: scale(0.6);
   }
-
   50% {
     transform: scale(1.25);
   }
-
   100% {
     transform: scale(1);
   }
 }
 
-
 @media (max-width: 860px) {
   .details-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .details-page {
+    padding: var(--sp-4) 0 var(--sp-6);
+  }
+  .details-grid {
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-6);
+  }
+  .details-main-image {
+    border-radius: var(--radius-md);
+  }
+  /* Thumbnails become a horizontally-scrollable strip instead of
+     wrapping — same pattern used for the category filter pills. */
+  .details-thumbs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .details-thumbs::-webkit-scrollbar {
+    display: none;
+  }
+  .details-thumb {
+    flex-shrink: 0;
+  }
+  .details-name {
+    font-size: var(--fs-xl);
+  }
+  .details-price {
+    font-size: var(--fs-lg);
+  }
+  .details-actions {
+    flex-direction: column;
+  }
+  .details-wishlist-btn {
+    width: 100%;
+    height: 44px;
+  }
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }

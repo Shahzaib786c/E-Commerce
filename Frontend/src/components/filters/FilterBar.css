@@ -153,4 +153,25 @@
   .filter-row .filter-sort {
     width: 100%;
   }
+
+  /* Category pills become a horizontally-scrollable row instead of
+     wrapping into a messy multi-line block — the standard mobile
+     pattern for filter chips (matches how most shopping apps handle
+     category filters on narrow screens). */
+  .filter-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    /* Hide the scrollbar visually while keeping it functional —
+       a visible scrollbar here looks like a design glitch, since the
+       row's own edge fade/momentum already signals "scroll me" on touch. */
+    scrollbar-width: none;
+  }
+  .filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+  .pill {
+    flex-shrink: 0;
+  }
 }

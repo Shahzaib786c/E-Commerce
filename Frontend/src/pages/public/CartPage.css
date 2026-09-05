@@ -96,7 +96,41 @@
   .cart-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Compact card layout: switches each cart row from a single cramped
+   flex line to a small grid, so image/name, quantity, price, and
+   remove all get their own clear space instead of squeezing into
+   one narrow row. Uses grid-template-areas mapped onto the existing
+   class names — no markup changes needed. */
+@media (max-width: 640px) {
   .cart-item {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    grid-template-areas:
+      "image info remove"
+      "image qty  price";
+    row-gap: var(--sp-2);
+    align-items: center;
+  }
+  .cart-item-image {
+    grid-area: image;
+    align-self: start;
+  }
+  .cart-item-info {
+    grid-area: info;
+  }
+  .cart-item-remove {
+    grid-area: remove;
+    justify-self: end;
+  }
+  .qty-stepper {
+    grid-area: qty;
+  }
+  .cart-item-price {
+    grid-area: price;
+    width: auto;
+    justify-self: end;
+    text-align: right;
   }
 }

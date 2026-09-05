@@ -19,6 +19,7 @@
   font-size: var(--fs-lg);
   font-weight: 600;
   color: var(--color-rose);
+  white-space: nowrap;
 }
 .navbar-links {
   display: flex;
@@ -123,11 +124,45 @@
     gap: var(--sp-3);
     border-bottom: 1px solid var(--color-border);
     display: none;
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
   }
   .navbar-links.open {
     display: flex;
   }
   .mobile-toggle {
     display: flex;
+  }
+  /* The category dropdown becomes a static, inline expansion inside the
+     mobile menu instead of an absolutely-positioned floating panel —
+     floating panels don't read correctly stacked inside a full-width
+     mobile menu. */
+  .navbar-links .navbar-dropdown {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .navbar-links .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    border: none;
+    margin-top: var(--sp-2);
+    padding-left: var(--sp-3);
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-logo {
+    font-size: var(--fs-md);
+  }
+  .navbar-icons {
+    gap: var(--sp-3);
+  }
+  .icon-btn {
+    font-size: 18px;
+  }
+  .dropdown-menu {
+    min-width: 160px;
   }
 }

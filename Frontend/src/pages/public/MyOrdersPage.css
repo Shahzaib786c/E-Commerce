@@ -1,0 +1,51 @@
+.my-orders-page {
+  padding: var(--sp-5) 0 var(--sp-7);
+}
+.order-card {
+  padding: var(--sp-4);
+}
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-2);
+  gap: var(--sp-2);
+}
+.order-card-id {
+  font-weight: 700;
+}
+.order-card-meta {
+  font-size: var(--fs-xs);
+  color: var(--color-plum-soft);
+  margin-bottom: var(--sp-2);
+}
+.order-card-items {
+  font-size: var(--fs-sm);
+  color: var(--color-plum-soft);
+}
+.order-card-total {
+  font-weight: 700;
+  margin-top: var(--sp-2);
+}
+
+@media (max-width: 480px) {
+  .my-orders-page {
+    padding: var(--sp-4) 0 var(--sp-6);
+  }
+  .order-card {
+    padding: var(--sp-3);
+  }
+  .order-card-header {
+    flex-wrap: wrap;
+  }
+  .order-card-id {
+    font-size: var(--fs-sm);
+  }
+  .order-card-meta,
+  .order-card-items {
+    font-size: var(--fs-xs);
+  }
+  .order-card-total {
+    font-size: var(--fs-md);
+  }
+}

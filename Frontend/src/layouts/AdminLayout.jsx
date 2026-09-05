@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import "./AdminLayout.css";
@@ -13,10 +14,11 @@ const NAV_ITEMS = [
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
         <p className="admin-sidebar-logo">Admin</p>
         <nav>
           {NAV_ITEMS.map((item) => (
@@ -24,6 +26,7 @@ export default function AdminLayout() {
               key={item.to}
               to={item.to}
               end={item.end}
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `admin-nav-item ${isActive ? "active" : ""}`
               }
@@ -35,9 +38,22 @@ export default function AdminLayout() {
         </nav>
       </aside>
 
+      {sidebarOpen && (
+        <div
+          className="admin-sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="admin-main">
         <header className="admin-topbar">
-          <span />
+          <button
+            className="admin-sidebar-toggle"
+            aria-label="Toggle menu"
+            onClick={() => setSidebarOpen((o) => !o)}
+          >
+            <i className="ti ti-menu-2" aria-hidden="true"></i>
+          </button>
           <div className="admin-topbar-user">
             <span>{user?.name}</span>
 

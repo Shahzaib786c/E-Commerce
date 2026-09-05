@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router";
 import { useOrders } from "../../context/OrderContext.jsx";
+import "./MyOrdersPage.css";
 
 const STATUS_CLASS = {
   pending: "status-pending",
@@ -19,17 +20,14 @@ export default function MyOrdersPage() {
 
   if (loading) {
     return (
-      <div
-        className="container"
-        style={{ padding: "var(--sp-5) 0 var(--sp-7)" }}
-      >
+      <div className="container my-orders-page">
         <p>Loading your orders...</p>
       </div>
     );
   }
 
   return (
-    <div className="container" style={{ padding: "var(--sp-5) 0 var(--sp-7)" }}>
+    <div className="container my-orders-page">
       <h1 style={{ marginBottom: "var(--sp-4)" }}>My orders</h1>
       {myOrders.length === 0 ? (
         <div className="empty-state">
@@ -52,45 +50,23 @@ export default function MyOrdersPage() {
           }}
         >
           {myOrders.map((order) => (
-            <div
-              key={order._id}
-              className="card"
-              style={{ padding: "var(--sp-4)" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "var(--sp-2)",
-                }}
-              >
-                <span style={{ fontWeight: 700 }}>
+            <div key={order._id} className="card order-card">
+              <div className="order-card-header">
+                <span className="order-card-id">
                   #{order._id.slice(-6).toUpperCase()}
                 </span>
                 <span className={`badge ${STATUS_CLASS[order.orderStatus]}`}>
                   {order.orderStatus}
                 </span>
               </div>
-              <p
-                style={{
-                  fontSize: "var(--fs-xs)",
-                  color: "var(--color-plum-soft)",
-                  marginBottom: "var(--sp-2)",
-                }}
-              >
+              <p className="order-card-meta">
                 {new Date(order.createdAt).toLocaleDateString()} ·{" "}
                 {order.paymentMethod}
               </p>
-              <p
-                style={{
-                  fontSize: "var(--fs-sm)",
-                  color: "var(--color-plum-soft)",
-                }}
-              >
+              <p className="order-card-items">
                 {order.items.map((i) => i.name).join(", ")}
               </p>
-              <p style={{ fontWeight: 700, marginTop: "var(--sp-2)" }}>
+              <p className="order-card-total">
                 ${order.totalAmount.toLocaleString()}
               </p>
             </div>

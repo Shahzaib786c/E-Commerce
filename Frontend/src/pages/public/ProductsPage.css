@@ -15,22 +15,40 @@
 .products-fade-wrap {
   opacity: 1;
   transition: opacity 0.2s ease;
-  min-height: 200px; /* prevents the page height from collapsing/jumping while empty during a transition */
+  min-height: 200px;
 }
 
 .products-fade-wrap.is-fetching {
   opacity: 0.4;
-  pointer-events: none; /* prevents clicking a product card mid-transition */
+  pointer-events: none;
 }
 .pagination {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
+  flex-wrap: wrap;
 }
 
 @media (max-width: 860px) {
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .products-page {
+    padding: var(--sp-4) 0 var(--sp-6);
+  }
+  .products-grid {
+    gap: var(--sp-3);
+  }
+  .pagination {
+    gap: 6px;
+  }
+  .pagination .btn {
+    min-width: 34px;
+    padding: 6px 10px;
+    font-size: var(--fs-xs);
   }
 }

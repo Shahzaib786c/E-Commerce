@@ -105,7 +105,6 @@
   gap: 6px;
 }
 
-/* Dots moved under the text column */
 .hero-dots {
   display: flex;
   align-items: center;
@@ -179,7 +178,6 @@
   transform: rotate(12deg);
 }
 
-/* ---- Prev / Next arrows, attached to the circle image ---- */
 .hero-arrow {
   position: absolute;
   top: 50%;
@@ -215,7 +213,6 @@
   right: -22px;
 }
 
-/* ---- Animations ---- */
 @keyframes heroFloat {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -227,13 +224,13 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- Responsive ---- */
+/* ---- Tablet ---- */
 @media (max-width: 960px) {
   .hero-carousel {
     grid-template-columns: 1fr;
     height: auto;
     max-height: none;
-    padding: var(--sp-8) var(--sp-4) var(--sp-12) var(--sp-4);
+    padding: var(--sp-8) var(--sp-4) var(--sp-6) var(--sp-4);
     text-align: center;
   }
   .hero-text-col {
@@ -264,5 +261,73 @@
   }
   .hero-arrow-next {
     right: -10px;
+  }
+}
+
+/* ---- Phone: tighter, more considered spacing than just "smaller tablet" ---- */
+@media (max-width: 480px) {
+  .hero-carousel {
+    padding: var(--sp-6) var(--sp-4) var(--sp-5) var(--sp-4);
+    margin-bottom: var(--sp-6);
+    gap: var(--sp-5);
+  }
+  .hero-kicker {
+    font-size: 10px;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  .hero-copy {
+    font-size: var(--fs-xs);
+    margin-bottom: 16px;
+    max-width: none;
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: 14px;
+    width: 100%;
+  }
+  .hero-actions .btn-primary {
+    width: 100%;
+    padding: 12px 24px;
+  }
+  .hero-features {
+    gap: var(--sp-2) var(--sp-4);
+    margin-bottom: 14px;
+  }
+  .hero-image-col {
+    margin-top: var(--sp-5);
+  }
+  .hero-image-blob {
+    max-width: 220px;
+    border: none;
+  }
+  .hero-image-blob img {
+    border-width: 5px;
+  }
+  .hero-price-badge {
+    width: 54px;
+    height: 54px;
+    font-size: var(--fs-sm);
+    border-width: 3px;
+  }
+  /* Negative-offset arrows can push past the viewport edge on narrow
+     phones and cause horizontal scroll — pull them inward and shrink
+     them rather than removing this useful navigation entirely. */
+  .hero-arrow {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+  .hero-arrow-prev {
+    left: 4px;
+  }
+  .hero-arrow-next {
+    right: 4px;
   }
 }

@@ -86,4 +86,30 @@
   .checkout-span-2 {
     grid-column: span 1;
   }
+  /* Order summary moves above the shipping form on mobile — a customer
+     wants to confirm what they're paying before scrolling through a
+     long address form, not after. Pure visual reorder, DOM/tab order
+     stays unchanged since this only affects grid placement. */
+  .checkout-summary {
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-page {
+    padding: var(--sp-4) 0 var(--sp-6);
+  }
+  .checkout-grid {
+    gap: var(--sp-4);
+  }
+  .checkout-section {
+    padding: var(--sp-3);
+  }
+  .checkout-summary {
+    padding: var(--sp-4);
+  }
+  .payment-option {
+    padding: 10px;
+    font-size: var(--fs-xs);
+  }
 }

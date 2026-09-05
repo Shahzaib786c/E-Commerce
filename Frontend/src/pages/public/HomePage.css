@@ -86,3 +86,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .home-page {
+    padding-top: var(--sp-4);
+  }
+  .home-section {
+    margin-bottom: var(--sp-5);
+  }
+  .home-section-title {
+    font-size: var(--fs-md);
+  }
+  .category-grid {
+    gap: var(--sp-2);
+  }
+  .category-tile {
+    padding: var(--sp-4) var(--sp-2);
+  }
+  .category-tile i {
+    font-size: 22px;
+  }
+  .category-tile span {
+    font-size: var(--fs-xs);
+  }
+  .products-grid {
+    gap: var(--sp-3);
+  }
+  .testimonial-card {
+    padding: var(--sp-3) var(--sp-4);
+  }
+}
