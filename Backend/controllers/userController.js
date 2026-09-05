@@ -117,7 +117,9 @@ export const logoutUser = (req, res) => {
     sameSite: "lax",
     domain: ".primenestly.com",
   });
+  return res.status(200).json({ message: "Logged out successfully" });
 };
+
 export const getMyProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
