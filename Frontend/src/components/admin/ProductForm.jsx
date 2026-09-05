@@ -16,6 +16,8 @@ const EMPTY = {
   rating: 0,
 };
 
+const MAX_IMAGES = 5;
+
 export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
   const { adminCategories, fetchAllCategoriesAdmin } = useProducts();
 
@@ -23,29 +25,45 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
     fetchAllCategoriesAdmin();
   }, []);
 
-  const [form, setForm] = useState(
-    initialValues || { ...EMPTY, category: adminCategories[0]?._id || "" },
-  );
+  const [form, setForm] = useState(initialValues || { ...EMPTY });
   const [variantInput, setVariantInput] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [existingImage, setExistingImage] = useState(
-    initialValues?.images?.[0] || null,
+
+  // Once real categories finish loading, if we're in "add" mode (no
+  // initialValues) and no category has been picked yet, default to the
+  // first one — this can't be done in useState's initial value above,
+  // since adminCategories is still empty at that exact first render.
+  useEffect(() => {
+    if (!initialValues && !form.category && adminCategories.length > 0) {
+      setForm((f) => ({ ...f, category: adminCategories[0]._id }));
+    }
+  }, [adminCategories]);
+
+  const [existingImages, setExistingImages] = useState(
+    initialValues?.images || [],
   );
+  const [newImageFiles, setNewImageFiles] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  const totalImageCount = existingImages.length + newImageFiles.length;
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
   function handleImageChange(e) {
-    const file = e.target.files?.[0];
-    if (file) setImageFile(file);
+    const files = Array.from(e.target.files || []);
+    const remainingSlots = MAX_IMAGES - totalImageCount;
+    if (remainingSlots <= 0) return;
+    setNewImageFiles((prev) => [...prev, ...files.slice(0, remainingSlots)]);
   }
 
-  function removeImage() {
-    setImageFile(null);
-    setExistingImage(null);
+  function removeExistingImage(url) {
+    setExistingImages((prev) => prev.filter((u) => u !== url));
+  }
+
+  function removeNewImage(index) {
+    setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
   }
 
   function addVariant() {
@@ -71,7 +89,8 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
       errs.price = "Enter a valid price";
     if (form.stock === "" || Number(form.stock) < 0)
       errs.stock = "Enter a valid stock count";
-    if (!imageFile && !existingImage) errs.image = "Product image is required";
+    if (totalImageCount === 0)
+      errs.image = "At least one product image is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -90,17 +109,14 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
     formData.append("isNewArrival", form.isNewArrival);
     formData.append("isBestseller", form.isBestseller);
     formData.append("variants", form.variants.join(","));
+    formData.append("existingImages", JSON.stringify(existingImages));
 
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
+    newImageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
 
     onSubmit(formData);
   }
-
-  const previewUrl = imageFile
-    ? URL.createObjectURL(imageFile)
-    : getImageUrl(existingImage);
 
   return (
     <form onSubmit={handleSubmit} className="product-form-grid">
@@ -123,6 +139,9 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
               value={form.category}
               onChange={(e) => update("category", e.target.value)}
             >
+              <option value="" disabled>
+                Select a category
+              </option>
               {adminCategories.map((c) => (
                 <option key={c._id} value={c._id}>
                   {c.categoryName}
@@ -228,30 +247,45 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
       </div>
 
       <div>
-        <p className="field-label-standalone">Product image</p>
+        <p className="field-label-standalone">
+          Product images ({totalImageCount}/{MAX_IMAGES})
+        </p>
         <div className="product-image-grid">
-          {!previewUrl && (
-            <label className="product-image-upload">
-              <i className="ti ti-plus" aria-hidden="true"></i>
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleImageChange}
-              />
-            </label>
-          )}
-          {previewUrl && (
-            <div className="product-image-thumb">
-              <img src={previewUrl} alt="" />
+          {existingImages.map((url) => (
+            <div key={url} className="product-image-thumb">
+              <img src={getImageUrl(url)} alt="" />
               <button
                 type="button"
-                onClick={removeImage}
+                onClick={() => removeExistingImage(url)}
                 aria-label="Remove image"
               >
                 <i className="ti ti-x" aria-hidden="true"></i>
               </button>
             </div>
+          ))}
+          {newImageFiles.map((file, i) => (
+            <div key={i} className="product-image-thumb">
+              <img src={URL.createObjectURL(file)} alt="" />
+              <button
+                type="button"
+                onClick={() => removeNewImage(i)}
+                aria-label="Remove image"
+              >
+                <i className="ti ti-x" aria-hidden="true"></i>
+              </button>
+            </div>
+          ))}
+          {totalImageCount < MAX_IMAGES && (
+            <label className="product-image-upload">
+              <i className="ti ti-plus" aria-hidden="true"></i>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={handleImageChange}
+              />
+            </label>
           )}
         </div>
         {errors.image && <p className="error-text">{errors.image}</p>}
@@ -260,7 +294,12 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel }) {
           <p className="field-label-standalone">Preview</p>
           <div className="product-preview-row">
             <div className="product-preview-image">
-              {previewUrl && <img src={previewUrl} alt="" />}
+              {existingImages[0] && (
+                <img src={getImageUrl(existingImages[0])} alt="" />
+              )}
+              {!existingImages[0] && newImageFiles[0] && (
+                <img src={URL.createObjectURL(newImageFiles[0])} alt="" />
+              )}
             </div>
             <div>
               <p style={{ fontWeight: 600, fontSize: "var(--fs-sm)" }}>

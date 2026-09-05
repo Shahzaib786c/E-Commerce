@@ -2,6 +2,8 @@ import Product from "../models/productModel.js";
 import Category from "../models/categoryModel.js";
 
 export const createProduct = async (req, res) => {
+      console.log("createProduct reached, req.files:", req.files);
+
   try {
     const {
       name,
@@ -15,26 +17,26 @@ export const createProduct = async (req, res) => {
       variants,
     } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Product image is required" });
+    if (!req.files || req.files.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "At least one product image is required" });
     }
 
     if (!name || !price || !stock || !category) {
-      return res.status(400).json({
-        message: "Missing required product fields",
-      });
+      return res
+        .status(400)
+        .json({ message: "Missing required product fields" });
     }
 
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
-      return res.status(404).json({
-        message: "Category not found",
-      });
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    const imageUrl = `/uploads/products/${req.file.filename}`;
+    // Cloudinary storage puts the real, permanent URL in req.file.path
+    const imageUrls = req.files.map((file) => file.path);
 
-    // form-data sends everything as strings — split "Small,Medium,Large" into a real array
     const variantsArray = variants
       ? variants
           .split(",")
@@ -47,20 +49,18 @@ export const createProduct = async (req, res) => {
       description,
       price,
       stock,
-      images: [imageUrl],
+      images: imageUrls,
       category,
       rating,
       isNewArrival,
       isBestseller,
       variants: variantsArray,
+      isActive: true,
     });
 
     res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -68,9 +68,10 @@ export const getProducts = async (req, res) => {
   try {
     const { search, category, sort, page = 1, limit = 8 } = req.query;
 
-    let filter = { isActive: true }; // product's OWN toggle must be true
+    let filter = { isActive: true };
 
     if (category) {
+      // If a specific category was requested, check it's actually active first
       const requestedCategory = await Category.findOne({
         slug: category,
         isActive: true,
@@ -82,6 +83,7 @@ export const getProducts = async (req, res) => {
       }
       filter.category = requestedCategory._id;
     } else {
+      // No specific category requested — exclude all products under any inactive category
       const inactiveCategories = await Category.find({
         isActive: false,
       }).select("_id");
@@ -117,35 +119,10 @@ export const getProducts = async (req, res) => {
       currentPage: pageNum,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-// @desc   Activate or deactivate a single product (admin only)
-// @route  PUT /api/products/:id/status
-export const updateProductStatus = async (req, res) => {
-  try {
-    const { isActive } = req.body;
-
-    if (typeof isActive !== "boolean") {
-      return res
-        .status(400)
-        .json({ message: "isActive must be true or false" });
-    }
-
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { isActive },
-      { new: true, runValidators: true },
-    ).populate("category", "categoryName slug icon");
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -183,38 +160,81 @@ export const getAllProductsAdmin = async (req, res) => {
   }
 };
 
+// @desc   Activate or deactivate a single product (admin only)
+// @route  PUT /api/products/:id/status
+export const updateProductStatus = async (req, res) => {
+  try {
+    const { isActive } = req.body;
+
+    if (typeof isActive !== "boolean") {
+      return res
+        .status(400)
+        .json({ message: "isActive must be true or false" });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { isActive },
+      { new: true, runValidators: true },
+    ).populate("category", "categoryName slug icon");
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 export const updateProduct = async (req, res) => {
   try {
     if (req.body.category) {
       const categoryExists = await Category.findById(req.body.category);
       if (!categoryExists) {
-        return res.status(404).json({
-          message: "Category not found",
-        });
+        return res.status(404).json({ message: "Category not found" });
       }
     }
 
     const updateData = { ...req.body };
 
-    if (req.file) {
-      updateData.images = [`/uploads/products/${req.file.filename}`];
+    // existingImages: a JSON array string of Cloudinary URLs the admin chose to KEEP
+    // (sent by the frontend so we know which old images survived the edit)
+    let keptImages = [];
+    if (req.body.existingImages) {
+      try {
+        keptImages = JSON.parse(req.body.existingImages);
+      } catch {
+        keptImages = [];
+      }
     }
+    delete updateData.existingImages; // not a real schema field, don't save it literally
+
+    const newImages = req.files ? req.files.map((file) => file.path) : [];
+
+    if (keptImages.length > 0 || newImages.length > 0) {
+      updateData.images = [...keptImages, ...newImages];
+    }
+
+    if (updateData.variants) {
+      updateData.variants = updateData.variants
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+    }
+
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });
 
     if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
+      return res.status(404).json({ message: "Product not found" });
     }
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 

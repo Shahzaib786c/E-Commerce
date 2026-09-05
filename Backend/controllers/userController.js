@@ -10,6 +10,19 @@ const generateToken = (userId) => {
   });
 };
 
+// Shared cookie options — works correctly on both localhost (HTTP) and
+// production (HTTPS, cross-domain). See explanation below.
+function getCookieOptions() {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    partitioned: isProduction,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+}
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -36,14 +49,7 @@ export const registerUser = async (req, res) => {
     });
 
     const token = generateToken(user._id);
-    // In registerUser and loginUser, replace the res.cookie(...) call with:
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      domain: ".primenestly.com",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token, getCookieOptions());
 
     res.status(201).json({
       _id: user._id,
@@ -87,14 +93,8 @@ export const loginUser = async (req, res) => {
     }
 
     const token = generateToken(user._id);
-    // In registerUser and loginUser, replace the res.cookie(...) call with:
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      domain: ".primenestly.com",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token, getCookieOptions());
+
     res.status(200).json({
       _id: user._id,
       name: user.name,
@@ -110,14 +110,10 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = (req, res) => {
-  // In logoutUser, replace res.clearCookie(...) with:
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    domain: ".primenestly.com",
+  res.clearCookie("token", getCookieOptions());
+  res.status(200).json({
+    message: "Logged out successfully",
   });
-  return res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const getMyProfile = async (req, res) => {
@@ -128,6 +124,7 @@ export const getMyProfile = async (req, res) => {
         message: "User not found",
       });
     }
+    res.set("Cache-Control", "no-store");
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({
@@ -182,7 +179,7 @@ export const updateUserRole = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { role },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     ).select("-password");
 
     if (!user) {
@@ -198,28 +195,22 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
-// @desc   Activate or deactivate a user account (admin only)
-// @route  PUT /api/users/:id/status
 export const updateUserStatus = async (req, res) => {
   try {
     const { isActive } = req.body;
 
     if (typeof isActive !== "boolean") {
-      return res
-        .status(400)
-        .json({ message: "isActive must be true or false" });
+      return res.status(400).json({ message: "isActive must be true or false" });
     }
 
     if (req.params.id === req.user._id.toString() && !isActive) {
-      return res
-        .status(400)
-        .json({ message: "You cannot deactivate your own account" });
+      return res.status(400).json({ message: "You cannot deactivate your own account" });
     }
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { isActive },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     ).select("-password");
 
     if (!user) {
@@ -244,20 +235,15 @@ export const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(200).json({
-        message:
-          "If an account with that email exists, a reset link has been sent.",
+        message: "If an account with that email exists, a reset link has been sent.",
       });
     }
 
-    // Generate a random raw token, but only store its HASH in the database
     const rawToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(rawToken)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
 
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 30 minutes
+    user.resetPasswordExpires = Date.now() + 30 * 60 * 1000;
     await user.save();
 
     const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password/${rawToken}`;
@@ -273,8 +259,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     res.status(200).json({
-      message:
-        "If an account with that email exists, a reset link has been sent.",
+      message: "If an account with that email exists, a reset link has been sent.",
     });
   } catch (error) {
     res.status(500).json({
@@ -283,6 +268,7 @@ export const forgotPassword = async (req, res) => {
     });
   }
 };
+
 export const resetPassword = async (req, res) => {
   try {
     const { password } = req.body;
@@ -292,10 +278,7 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
 
     const user = await User.findOne({
       resetPasswordToken: hashedToken,

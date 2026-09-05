@@ -1,5 +1,6 @@
+import 'dotenv/config'; // <-- this special import form runs dotenv's config() AS PART OF being imported — happens during the import-resolution phase itself, before express/cors/etc. get evaluated
+
 import express from 'express';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
@@ -11,10 +12,15 @@ import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import path from "path";
 import contactRoutes from './routes/contactRoutes.js';
-dotenv.config();
 
 const app = express();
 connectDB();
+
+app.use((req, res, next) => {
+    console.log(`Incoming request: ${req.method} ${req.url}`);
+    next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(

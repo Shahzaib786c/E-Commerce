@@ -22,7 +22,7 @@ export function ProductsProvider({ children }) {
         api.get("/products"),
         api.get("/categories"),
       ]);
-      setProducts(productsRes.data.products); // <-- .products, since the endpoint now returns an object
+      setProducts(productsRes.data.products); // <-- must be .products, not just .data
       setCategories(categoriesRes.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load products");
@@ -98,7 +98,7 @@ export function ProductsProvider({ children }) {
     const res = await api.put(`/products/${id}/status`, { isActive });
     setAdminProducts((prev) => prev.map((p) => (p._id === id ? res.data : p)));
     return res.data;
-}
+  }
 
   async function deleteCategory(id) {
     await api.delete(`/categories/${id}`);

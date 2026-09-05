@@ -1,6 +1,16 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
+function getCookieOptions() {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    partitioned: isProduction,
+  };
+}
+
 export const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;
@@ -17,10 +27,9 @@ export const protect = async (req, res, next) => {
     }
 
     if (!user.isActive) {
-      res.clearCookie("token"); // proactively clear their stale cookie too
+      res.clearCookie("token", getCookieOptions());
       return res.status(403).json({
-        message:
-          "Your account has been deactivated. Please contact your admin.",
+        message: "Your account has been deactivated. Please contact your admin.",
       });
     }
 
