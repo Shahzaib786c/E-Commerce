@@ -83,6 +83,7 @@ export default function CheckoutPage() {
       });
 
       clearCart();
+      showToast("Order placed! Check your email for confirmation.");
       navigate("/order-success", { state: { order } });
     } catch (err) {
       showToast(
