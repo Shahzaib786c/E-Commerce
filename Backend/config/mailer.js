@@ -1,7 +1,6 @@
 import { Resend } from "resend";
 
-const FROM_ADDRESS = "Cuddle & Co <onboarding@resend.dev>";
-
+const FROM_ADDRESS = "Cuddle & Co <orders@primenestly.com>";
 export async function sendContactNotification({ name, email, message }) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
