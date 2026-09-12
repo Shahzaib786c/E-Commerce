@@ -28,6 +28,29 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
     {
+        // ---- ADDED --------------------------------------------------------
+        // The database already carries a unique index named "orderNumber_1"
+        // from an earlier version of this schema. The field itself was removed
+        // from the code but Mongoose never drops indexes it didn't create this
+        // run, so every order was inserting with orderNumber: null and
+        // colliding with the one document that already held null.
+        //
+        // Rather than drop the index and lose order numbers entirely, the field
+        // is restored properly. The default runs on every insert, so the value
+        // can never be null again.
+        //
+        // Format: ORD-<ms timestamp>-<4 random digits>. Not sequential, but it
+        // needs no counters collection — which is exactly the kind of thing
+        // that goes missing during a database migration.
+        orderNumber: {
+            type: String,
+            unique: true,
+            required: true,
+            default: () =>
+                `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
+        },
+        // -------------------------------------------------------------------
+
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         items: [orderItemSchema],
         totalAmount: { type: Number, required: true },
@@ -56,4 +79,5 @@ const orderSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
 export default mongoose.model("Order", orderSchema);

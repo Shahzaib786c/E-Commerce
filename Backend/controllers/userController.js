@@ -10,8 +10,6 @@ const generateToken = (userId) => {
   });
 };
 
-// Shared cookie options — works correctly on both localhost (HTTP) and
-// production (HTTPS, cross-domain). See explanation below.
 function getCookieOptions() {
   const isProduction = process.env.NODE_ENV === "production";
   return {

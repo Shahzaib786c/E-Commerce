@@ -34,7 +34,6 @@ export const createProduct = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    // Cloudinary storage puts the real, permanent URL in req.file.path
     const imageUrls = req.files.map((file) => file.path);
 
     const variantsArray = variants
@@ -71,7 +70,6 @@ export const getProducts = async (req, res) => {
     let filter = { isActive: true };
 
     if (category) {
-      // If a specific category was requested, check it's actually active first
       const requestedCategory = await Category.findOne({
         slug: category,
         isActive: true,
@@ -83,7 +81,6 @@ export const getProducts = async (req, res) => {
       }
       filter.category = requestedCategory._id;
     } else {
-      // No specific category requested — exclude all products under any inactive category
       const inactiveCategories = await Category.find({
         isActive: false,
       }).select("_id");
@@ -160,8 +157,7 @@ export const getAllProductsAdmin = async (req, res) => {
   }
 };
 
-// @desc   Activate or deactivate a single product (admin only)
-// @route  PUT /api/products/:id/status
+
 export const updateProductStatus = async (req, res) => {
   try {
     const { isActive } = req.body;
@@ -199,8 +195,7 @@ export const updateProduct = async (req, res) => {
 
     const updateData = { ...req.body };
 
-    // existingImages: a JSON array string of Cloudinary URLs the admin chose to KEEP
-    // (sent by the frontend so we know which old images survived the edit)
+ 
     let keptImages = [];
     if (req.body.existingImages) {
       try {
@@ -209,7 +204,7 @@ export const updateProduct = async (req, res) => {
         keptImages = [];
       }
     }
-    delete updateData.existingImages; // not a real schema field, don't save it literally
+    delete updateData.existingImages; 
 
     const newImages = req.files ? req.files.map((file) => file.path) : [];
 
